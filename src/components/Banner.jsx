@@ -84,7 +84,7 @@ export const Banner = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
                   <div className="text-center">
                     {/* Icon */}
-                    <div className="flex items-center justify-center w-20 h-20 bg-white bg-opacity-20 rounded-2xl mx-auto mb-6">
+                    <div className="flex items-center justify-center w-20 h-20 bg-white bg-opacity-20 rounded-2xl mx-auto mb-6 text-gray-500">
                       <IconComponent className="text-gray text-3xl" />
                     </div>
 

@@ -3,6 +3,7 @@ import { Banner } from "../components/Banner";
 import { Partners } from "../components/Partners";
 import { TeacherCTA } from "../components/TeacherCTA";
 import { HowItWorks } from "../components/HowItWorks";
+import { FAQ } from "../components/FAQ";
 
 export const Home = () => {
   return (
@@ -11,6 +12,7 @@ export const Home = () => {
       <Partners />
       <TeacherCTA />
       <HowItWorks />
+      <FAQ />
     </div>
   );
 };
