@@ -53,14 +53,14 @@ export const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo and Navigation Links */}
           <div className="flex items-center space-x-8">
-            <div className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3">
               <div className="flex items-center justify-center w-10 h-10 bg-[#5D5CDE] rounded-lg">
                 <MdOutlineSchool className="text-white text-xl" />
               </div>
               <span className="md:text-xl font-bold text-gray-900 dark:text-white">
                 EduManage
               </span>
-            </div>
+            </Link>
 
             <div className="hidden md:flex items-center space-x-6">
               <a
