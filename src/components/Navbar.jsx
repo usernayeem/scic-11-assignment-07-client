@@ -75,12 +75,12 @@ export const Navbar = () => {
               >
                 All Classes
               </a>
-              <a
-                href="#"
+              <Link
+                to="/teach"
                 className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
               >
                 Teach on EduManage
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -177,13 +177,13 @@ export const Navbar = () => {
               >
                 All Classes
               </a>
-              <a
-                href="#"
+              <Link
+                to="/teach"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Teach on EduManage
-              </a>
+              </Link>
 
               {/* Mobile Auth Section */}
               {!user && !loading && (
@@ -198,7 +198,7 @@ export const Navbar = () => {
               {user && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
                   <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Signed in as: {getUserDisplayName()}
+                    Signed in as: {user.displayName}
                   </div>
                   <button className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200">
                     Dashboard

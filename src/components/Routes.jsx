@@ -5,6 +5,7 @@ import { Home } from "../pages/Home";
 import { Register } from "../pages/Register";
 import { Login } from "../pages/Login";
 import { NotFound } from "../pages/NotFound";
+import { TeachOnEduManage } from "../pages/TeachOnEduManage";
 
 export const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/teach",
+        element: <TeachOnEduManage />,
       },
       {
         path: "*",
