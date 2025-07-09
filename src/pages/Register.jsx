@@ -9,7 +9,7 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { updateProfile } from "firebase/auth";
@@ -280,12 +280,12 @@ export const Register = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{" "}
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="font-medium text-[#5D5CDE] hover:text-[#4A4BC9] transition-colors duration-200"
               >
                 Login in here
-              </a>
+              </Link>
             </p>
           </div>
         </div>
