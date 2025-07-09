@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
@@ -10,28 +11,44 @@ export const Login = () => {
   const toast = useToast();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onBlur", // Validate on blur for better UX
   });
+
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // Validation rules
+  const validationRules = {
+    email: {
+      required: "Email is required",
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: "Please enter a valid email address",
+      },
+    },
+    password: {
+      required: "Password is required",
+      minLength: {
+        value: 1,
+        message: "Password is required",
+      },
+    },
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
+  // Form submission handler
+  const onSubmit = async (data) => {
     try {
-      await Login(formData.email, formData.password);
+      await Login(data.email, data.password);
       toast.success("Login successful!");
       navigate("/");
     } catch (error) {
@@ -46,8 +63,6 @@ export const Login = () => {
       } else {
         toast.error("Login failed. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -86,7 +101,11 @@ export const Login = () => {
 
         {/* Login Form */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-6"
+            noValidate
+          >
             {/* Email Field */}
             <div>
               <label
@@ -101,15 +120,26 @@ export const Login = () => {
                 </div>
                 <input
                   id="email"
-                  name="email"
                   type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="block w-full pl-10 pr-3 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  {...register("email", validationRules.email)}
+                  className={`block w-full pl-10 pr-3 py-3 text-base border rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 ${
+                    errors.email
+                      ? "border-red-500 ring-2 ring-red-200 dark:ring-red-800"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   placeholder="Enter your email"
+                  aria-invalid={errors.email ? "true" : "false"}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                 />
               </div>
+              {errors.email && (
+                <p
+                  id="email-error"
+                  className="mt-2 text-sm text-red-600 dark:text-red-400"
+                >
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             {/* Password Field */}
@@ -126,18 +156,24 @@ export const Login = () => {
                 </div>
                 <input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="block w-full pl-10 pr-12 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  {...register("password", validationRules.password)}
+                  className={`block w-full pl-10 pr-12 py-3 text-base border rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 ${
+                    errors.password
+                      ? "border-red-500 ring-2 ring-red-200 dark:ring-red-800"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   placeholder="Enter your password"
+                  aria-invalid={errors.password ? "true" : "false"}
+                  aria-describedby={
+                    errors.password ? "password-error" : undefined
+                  }
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200" />
@@ -146,6 +182,14 @@ export const Login = () => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p
+                  id="password-error"
+                  className="mt-2 text-sm text-red-600 dark:text-red-400"
+                >
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* Forgot Password Link */}
@@ -161,10 +205,10 @@ export const Login = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-4 rounded-xl font-semibold text-base hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl group"
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
                 <>
@@ -193,7 +237,7 @@ export const Login = () => {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            disabled={googleLoading || isLoading}
+            disabled={googleLoading || isSubmitting}
             className="mt-4 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-xl font-semibold text-base hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
           >
             {googleLoading ? (

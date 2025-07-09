@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   FiUser,
   FiMail,
@@ -13,62 +14,98 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { updateProfile } from "firebase/auth";
+import axios from "axios";
 
 export const Register = () => {
   const { registerUser, googleAuth } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    photoURL: "",
+  // React Hook Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    watch,
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      photoURL: "",
+    },
+    mode: "onBlur", // Validate on blur for better UX
   });
+
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  // Validation rules
+  const validationRules = {
+    email: {
+      required: "Email is required",
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+        message: "Please enter a valid email address",
+      },
+    },
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
+  // Function to save user data to MongoDB
+  const saveUserToDatabase = async (user, userData) => {
     try {
-      const userCredential = await registerUser(
-        formData.email,
-        formData.password
-      );
+      const response = await axios.post(`${import.meta.env.VITE_API}/users`, {
+        uid: user.uid,
+        name: userData.name || user.displayName,
+        email: user.email,
+        photoURL: userData.photoURL || user.photoURL || "",
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error saving user to database:", error);
+      throw error;
+    }
+  };
+
+  // Form submission handler
+  const onSubmit = async (data) => {
+    try {
+      const userCredential = await registerUser(data.email, data.password);
 
       await updateProfile(userCredential.user, {
-        displayName: formData.name,
-        photoURL: formData.photoURL,
+        displayName: data.name,
+        photoURL: data.photoURL,
       });
+
+      // Save user data to MongoDB
+      await saveUserToDatabase(userCredential.user, data);
 
       toast.success("Registration successful!");
       navigate("/");
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         toast.error("This email is already registered.");
+      } else if (error.code === "auth/weak-password") {
+        toast.error("Password is too weak. Please choose a stronger password.");
+      } else if (error.code === "auth/invalid-email") {
+        toast.error("Please enter a valid email address.");
       } else {
         toast.error("Registration failed. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleGoogleRegister = async () => {
     setGoogleLoading(true);
     try {
-      await googleAuth();
+      const result = await googleAuth();
+
+      // Save Google user data to MongoDB
+      await saveUserToDatabase(result.user, {
+        name: result.user.displayName,
+        photoURL: result.user.photoURL,
+      });
+
       toast.success("Google registration successful!");
       navigate("/");
     } catch (error) {
@@ -100,8 +137,12 @@ export const Register = () => {
 
         {/* Registration Form */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 border border-gray-200 dark:border-gray-700">
-          <form onSubmit={handleRegister} className="space-y-6">
-            {/* Name Field */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-6"
+            noValidate
+          >
+            {/* Name Field - No validation */}
             <div>
               <label
                 htmlFor="name"
@@ -115,18 +156,15 @@ export const Register = () => {
                 </div>
                 <input
                   id="name"
-                  name="name"
                   type="text"
-                  required
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="block w-full pl-10 pr-3 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  {...register("name")}
+                  className="block w-full pl-10 pr-3 py-3 text-base border rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 border-gray-300 dark:border-gray-600"
                   placeholder="Enter your full name"
                 />
               </div>
             </div>
 
-            {/* Email Field */}
+            {/* Email Field - Validation kept */}
             <div>
               <label
                 htmlFor="email"
@@ -140,18 +178,29 @@ export const Register = () => {
                 </div>
                 <input
                   id="email"
-                  name="email"
                   type="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="block w-full pl-10 pr-3 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  {...register("email", validationRules.email)}
+                  className={`block w-full pl-10 pr-3 py-3 text-base border rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 ${
+                    errors.email
+                      ? "border-red-500 ring-2 ring-red-200 dark:ring-red-800"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
                   placeholder="Enter your email"
+                  aria-invalid={errors.email ? "true" : "false"}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                 />
               </div>
+              {errors.email && (
+                <p
+                  id="email-error"
+                  className="mt-2 text-sm text-red-600 dark:text-red-400"
+                >
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
-            {/* Password Field */}
+            {/* Password Field - No validation */}
             <div>
               <label
                 htmlFor="password"
@@ -165,18 +214,16 @@ export const Register = () => {
                 </div>
                 <input
                   id="password"
-                  name="password"
                   type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="block w-full pl-10 pr-12 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  {...register("password")}
+                  className="block w-full pl-10 pr-12 py-3 text-base border rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 border-gray-300 dark:border-gray-600"
                   placeholder="Enter your password"
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
                     <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200" />
@@ -187,7 +234,7 @@ export const Register = () => {
               </div>
             </div>
 
-            {/* Photo URL Field */}
+            {/* Photo URL Field - No validation */}
             <div>
               <label
                 htmlFor="photoURL"
@@ -201,11 +248,9 @@ export const Register = () => {
                 </div>
                 <input
                   id="photoURL"
-                  name="photoURL"
                   type="url"
-                  value={formData.photoURL}
-                  onChange={handleInputChange}
-                  className="block w-full pl-10 pr-3 py-3 text-base border border-gray-300 dark:border-gray-600 rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  {...register("photoURL")}
+                  className="block w-full pl-10 pr-3 py-3 text-base border rounded-xl placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 border-gray-300 dark:border-gray-600"
                   placeholder="Enter photo URL (optional)"
                 />
               </div>
@@ -214,10 +259,10 @@ export const Register = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
               className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-4 rounded-xl font-semibold text-base hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl group"
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
                 <>
@@ -246,7 +291,7 @@ export const Register = () => {
           <button
             type="button"
             onClick={handleGoogleRegister}
-            disabled={googleLoading || isLoading}
+            disabled={googleLoading || isSubmitting}
             className="mt-4 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-xl font-semibold text-base hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm hover:shadow-md"
           >
             {googleLoading ? (
