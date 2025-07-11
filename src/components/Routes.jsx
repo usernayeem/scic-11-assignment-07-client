@@ -8,12 +8,11 @@ import { NotFound } from "../pages/NotFound";
 import { TeachOnEduManage } from "../pages/TeachOnEduManage";
 import { StudentDashboard } from "../pages/StudentDashboard";
 import { MyEnrollClasses } from "../pages/MyEnrollClasses";
-import { StudentProfile } from "../pages/StudentProfile";
+import { Profile } from "../pages/Profile";
 import { AdminDashboard } from "../pages/AdminDashboard";
 import { TeacherRequest } from "../pages/TeacherRequest";
 import { Users } from "../pages/Users";
 import { AllClasses } from "../pages/AllClasses";
-import { AdminProfile } from "../pages/AdminProfile";
 
 export const router = createBrowserRouter([
   {
@@ -50,7 +49,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "profile",
-            element: <StudentProfile />,
+            element: <Profile />,
           },
         ],
       },
@@ -76,7 +75,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "profile",
-            element: <AdminProfile />,
+            element: <Profile />,
           },
         ],
       },

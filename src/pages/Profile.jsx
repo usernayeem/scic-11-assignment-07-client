@@ -13,7 +13,7 @@ import { useToast } from "../contexts/ToastContext";
 import { updateProfile } from "firebase/auth";
 import { useForm } from "react-hook-form";
 
-export const StudentProfile = () => {
+export const Profile = () => {
   const { user, auth } = useContext(AuthContext);
   const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
