@@ -9,6 +9,11 @@ import { TeachOnEduManage } from "../pages/TeachOnEduManage";
 import { StudentDashboard } from "../pages/StudentDashboard";
 import { MyEnrollClasses } from "../pages/MyEnrollClasses";
 import { StudentProfile } from "../pages/StudentProfile";
+import { AdminDashboard } from "../pages/AdminDashboard";
+import { TeacherRequest } from "../pages/TeacherRequest";
+import { Users } from "../pages/Users";
+import { AllClasses } from "../pages/AllClasses";
+import { AdminProfile } from "../pages/AdminProfile";
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +51,32 @@ export const router = createBrowserRouter([
           {
             path: "profile",
             element: <StudentProfile />,
+          },
+        ],
+      },
+      {
+        path: "/admin-dashboard",
+        element: <AdminDashboard />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="teacher-request" />,
+          },
+          {
+            path: "teacher-request",
+            element: <TeacherRequest />,
+          },
+          {
+            path: "users",
+            element: <Users />,
+          },
+          {
+            path: "all-classes",
+            element: <AllClasses />,
+          },
+          {
+            path: "profile",
+            element: <AdminProfile />,
           },
         ],
       },

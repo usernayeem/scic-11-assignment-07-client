@@ -5,10 +5,12 @@ import { MdOutlineSchool } from "react-icons/md";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDashboardLoading, setIsDashboardLoading] = useState(false);
   const dropdownRef = useRef(null);
 
   // Auth context
@@ -45,6 +47,45 @@ export const Navbar = () => {
     } catch (error) {
       toast.error("Logout failed. Please try again.");
     }
+  };
+
+  const handleDashboardClick = async () => {
+    setIsDashboardLoading(true);
+    setIsDropdownOpen(false);
+
+    try {
+      // Fetch user data from backend to get role
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/users/${user.uid}`
+      );
+
+      if (response.data.success) {
+        const userRole = response.data.user.role;
+
+        // Redirect based on role
+        if (userRole === "admin") {
+          navigate("/admin-dashboard");
+          toast.success("Welcome to Admin Dashboard!");
+        } else {
+          navigate("/student-dashboard");
+          toast.success("Welcome to Student Dashboard!");
+        }
+      } else {
+        toast.error("Unable to determine user role");
+        navigate("/");
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+      toast.error("Failed to access dashboard. Please try again.");
+      navigate("/");
+    } finally {
+      setIsDashboardLoading(false);
+    }
+  };
+
+  const handleMobileDashboardClick = () => {
+    setIsMobileMenuOpen(false);
+    handleDashboardClick();
   };
 
   return (
@@ -133,13 +174,23 @@ export const Navbar = () => {
                         </p>
                       )}
                     </div>
-                    <Link
-                      to="/student-dashboard"
-                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
+                    <button
+                      onClick={handleDashboardClick}
+                      disabled={isDashboardLoading}
+                      className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      <FiGrid className="text-gray-500 dark:text-gray-400" />
-                      <span>Dashboard</span>
-                    </Link>
+                      {isDashboardLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
+                          <span>Loading...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiGrid className="text-gray-500 dark:text-gray-400" />
+                          <span>Dashboard</span>
+                        </>
+                      )}
+                    </button>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center space-x-2"
@@ -203,12 +254,13 @@ export const Navbar = () => {
                   <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
                     Signed in as: {user.displayName}
                   </div>
-                  <Link
-                    to="/student-dashboard"
-                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
+                  <button
+                    onClick={handleMobileDashboardClick}
+                    disabled={isDashboardLoading}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Dashboard
-                  </Link>
+                    {isDashboardLoading ? "Loading Dashboard..." : "Dashboard"}
+                  </button>
                   <button
                     onClick={() => {
                       handleLogout();
