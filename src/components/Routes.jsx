@@ -17,6 +17,7 @@ import { TeacherRequest } from "../pages/TeacherRequest";
 import { Users } from "../pages/Users";
 import { AllClasses } from "../pages/AllClasses";
 import { PrivateRoute } from "./PrivateRoutes";
+import { TeacherRoute } from "./TeacherRoute";
 
 export const router = createBrowserRouter([
   {
@@ -69,7 +70,9 @@ export const router = createBrowserRouter([
         path: "/teacher-dashboard",
         element: (
           <PrivateRoute>
-            <TeacherDashboard />
+            <TeacherRoute>
+              <TeacherDashboard />
+            </TeacherRoute>
           </PrivateRoute>
         ),
         children: [
