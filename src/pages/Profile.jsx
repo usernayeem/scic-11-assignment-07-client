@@ -89,11 +89,6 @@ export const Profile = () => {
                 <p className="text-gray-600 dark:text-gray-300 text-lg">
                   {user?.email}
                 </p>
-                <div className="flex items-center space-x-2 mt-2">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                    Active Student
-                  </span>
-                </div>
               </div>
             </div>
 

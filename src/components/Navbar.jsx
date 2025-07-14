@@ -66,6 +66,9 @@ export const Navbar = () => {
         if (userRole === "admin") {
           navigate("/admin-dashboard");
           toast.success("Welcome to Admin Dashboard!");
+        } else if (userRole === "teacher") {
+          navigate("/teacher-dashboard");
+          toast.success("Welcome to Teacher Dashboard!");
         } else {
           navigate("/student-dashboard");
           toast.success("Welcome to Student Dashboard!");

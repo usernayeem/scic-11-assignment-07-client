@@ -10,6 +10,7 @@ import {
   FiGlobe,
 } from "react-icons/fi";
 import { MdSchool, MdVerified } from "react-icons/md";
+import { Link } from "react-router";
 
 export const TeacherCTA = () => {
   const benefits = [
@@ -121,13 +122,13 @@ export const TeacherCTA = () => {
               difference in students' lives while building your teaching career.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="bg-white text-[#5D5CDE] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl hover:-translate-y-1">
+              <Link
+                to="/teach"
+                className="bg-white text-[#5D5CDE] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl hover:-translate-y-1"
+              >
                 <span>Apply to Teach</span>
                 <FiArrowRight className="w-5 h-5" />
-              </button>
-              <button className="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white hover:text-[#5D5CDE] transition-all duration-200">
-                Learn More
-              </button>
+              </Link>
             </div>
             <p className="text-white text-opacity-75 mt-6 text-sm">
               * Free to apply • No teaching experience required • Full support
