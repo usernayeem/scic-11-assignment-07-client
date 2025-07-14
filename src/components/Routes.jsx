@@ -16,6 +16,7 @@ import { AdminDashboard } from "../pages/AdminDashboard";
 import { TeacherRequest } from "../pages/TeacherRequest";
 import { Users } from "../pages/Users";
 import { AllClasses } from "../pages/AllClasses";
+import { PrivateRoute } from "./PrivateRoutes";
 
 export const router = createBrowserRouter([
   {
@@ -36,11 +37,19 @@ export const router = createBrowserRouter([
       },
       {
         path: "/teach",
-        element: <TeachOnEduManage />,
+        element: (
+          <PrivateRoute>
+            <TeachOnEduManage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "/student-dashboard",
-        element: <StudentDashboard />,
+        element: (
+          <PrivateRoute>
+            <StudentDashboard />
+          </PrivateRoute>
+        ),
         children: [
           {
             index: true,
@@ -58,7 +67,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/teacher-dashboard",
-        element: <TeacherDashboard />,
+        element: (
+          <PrivateRoute>
+            <TeacherDashboard />
+          </PrivateRoute>
+        ),
         children: [
           {
             index: true,
@@ -80,7 +93,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin-dashboard",
-        element: <AdminDashboard />,
+        element: (
+          <PrivateRoute>
+            <AdminDashboard />
+          </PrivateRoute>
+        ),
         children: [
           {
             index: true,
