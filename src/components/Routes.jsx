@@ -18,6 +18,7 @@ import { Users } from "../pages/Users";
 import { AllClasses } from "../pages/AllClasses";
 import { PrivateRoute } from "./PrivateRoutes";
 import { TeacherRoute } from "./TeacherRoute";
+import { AdminRoute } from "./AdminRoute";
 
 export const router = createBrowserRouter([
   {
@@ -98,7 +99,9 @@ export const router = createBrowserRouter([
         path: "/admin-dashboard",
         element: (
           <PrivateRoute>
-            <AdminDashboard />
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
           </PrivateRoute>
         ),
         children: [
