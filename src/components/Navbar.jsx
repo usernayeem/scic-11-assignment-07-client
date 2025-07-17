@@ -113,12 +113,13 @@ export const Navbar = () => {
               >
                 Home
               </a>
-              <a
+              <Link
+                to="/all-class"
                 href="#"
                 className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
               >
                 All Classes
-              </a>
+              </Link>
               <Link
                 to="/teach"
                 className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"

@@ -15,10 +15,12 @@ import { MyClasses } from "../pages/MyClasses";
 import { AdminDashboard } from "../pages/AdminDashboard";
 import { TeacherRequest } from "../pages/TeacherRequest";
 import { Users } from "../pages/Users";
-import { AllClasses } from "../pages/AllClasses";
+import { AdminAllClasses } from "../pages/AdminAllClasses";
 import { PrivateRoute } from "./PrivateRoutes";
 import { TeacherRoute } from "./TeacherRoute";
 import { AdminRoute } from "./AdminRoute";
+import { AllClass } from "../pages/AllClass";
+import { ClassDetails } from "../pages/ClassDetails";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +44,22 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <TeachOnEduManage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/all-class",
+        element: (
+          <PrivateRoute>
+            <AllClass />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/all-class/:id",
+        element: (
+          <PrivateRoute>
+            <ClassDetails />
           </PrivateRoute>
         ),
       },
@@ -118,8 +136,8 @@ export const router = createBrowserRouter([
             element: <Users />,
           },
           {
-            path: "all-classes",
-            element: <AllClasses />,
+            path: "admin-all-classes",
+            element: <AdminAllClasses />,
           },
           {
             path: "profile",

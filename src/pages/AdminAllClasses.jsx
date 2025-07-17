@@ -13,7 +13,7 @@ import { MdVerified, MdPending } from "react-icons/md";
 import axios from "axios";
 import { useToast } from "../contexts/ToastContext";
 
-export const AllClasses = () => {
+export const AdminAllClasses = () => {
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState({});
@@ -242,7 +242,7 @@ export const AllClasses = () => {
                         className="h-16 w-16 rounded-lg object-cover"
                         onError={(e) => {
                           e.target.src =
-                            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+                            "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
                         }}
                       />
                       <div className="ml-4">

@@ -41,7 +41,7 @@ export const AdminDashboard = () => {
     },
     {
       name: "All Classes",
-      path: "/admin-dashboard/all-classes",
+      path: "/admin-dashboard/admin-all-classes",
       icon: FiBookOpen,
     },
     {

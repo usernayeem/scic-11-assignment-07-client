@@ -375,7 +375,7 @@ export const MyClasses = () => {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.src =
-                      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+                      "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
                   }}
                 />
                 <div className="absolute top-4 right-4">
