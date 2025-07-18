@@ -21,6 +21,7 @@ import { TeacherRoute } from "./TeacherRoute";
 import { AdminRoute } from "./AdminRoute";
 import { AllClass } from "../pages/AllClass";
 import { ClassDetails } from "../pages/ClassDetails";
+import { Payment } from "../pages/CheckoutForm";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <ClassDetails />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/payment/:id",
+        element: (
+          <PrivateRoute>
+            <Payment />
           </PrivateRoute>
         ),
       },
