@@ -40,12 +40,10 @@ export const ClassDetails = () => {
       if (response.data.success) {
         const classInfo = response.data.class;
         setClassData(classInfo);
-        
+
         // Check if user is already enrolled
         if (classInfo.enrolledStudents && user?.uid) {
-          setIsAlreadyEnrolled(
-            classInfo.enrolledStudents.includes(user.uid)
-          );
+          setIsAlreadyEnrolled(classInfo.enrolledStudents.includes(user.uid));
         }
       } else {
         toast.error("Class not found");
@@ -62,8 +60,6 @@ export const ClassDetails = () => {
 
   // Handle enrollment/payment
   const handleEnrollment = () => {
-    
-
     if (isAlreadyEnrolled) {
       toast.info("You are already enrolled in this class");
       return;
@@ -211,7 +207,7 @@ export const ClassDetails = () => {
                       {classData.enrolledStudents?.length || 0}
                     </p>
                   </div>
-                  
+
                   <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
                     <div className="flex items-center text-gray-600 dark:text-gray-400 mb-1">
                       <FiCalendar className="w-4 h-4 mr-2" />
@@ -219,16 +215,6 @@ export const ClassDetails = () => {
                     </div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {formatDate(classData.createdAt)}
-                    </p>
-                  </div>
-
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 col-span-2 md:col-span-1">
-                    <div className="flex items-center text-gray-600 dark:text-gray-400 mb-1">
-                      <FiStar className="w-4 h-4 mr-2" />
-                      <span className="text-sm">Rating</span>
-                    </div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      5.0
                     </p>
                   </div>
                 </div>
