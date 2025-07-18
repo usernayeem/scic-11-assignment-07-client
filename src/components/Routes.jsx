@@ -22,6 +22,8 @@ import { AdminRoute } from "./AdminRoute";
 import { AllClass } from "../pages/AllClass";
 import { ClassDetails } from "../pages/ClassDetails";
 import { Payment } from "../pages/CheckoutForm";
+import { EnrolledClassDetails } from "../pages/EnrolledClassDetails";
+import { ClassDetailsTeacher } from "../pages/ClassDetailsTeacher";
 
 export const router = createBrowserRouter([
   {
@@ -82,11 +84,15 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="my-classes" />,
+            element: <Navigate to="my-enroll-classes" />,
           },
           {
-            path: "my-classes",
+            path: "my-enroll-classes",
             element: <MyEnrollClasses />,
+          },
+          {
+            path: "my-enroll-class/:id",
+            element: <EnrolledClassDetails />,
           },
           {
             path: "profile",
@@ -115,6 +121,10 @@ export const router = createBrowserRouter([
           {
             path: "my-classes",
             element: <MyClasses />,
+          },
+          {
+            path: "my-classes/:id",
+            element: <ClassDetailsTeacher />,
           },
           {
             path: "profile",

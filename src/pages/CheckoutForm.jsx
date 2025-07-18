@@ -129,7 +129,7 @@ const CheckoutForm = ({ classData, amount, onSuccess }) => {
 
           // Redirect to enrolled classes after a short delay
           setTimeout(() => {
-            navigate("/student-dashboard/my-classes");
+            navigate("/student-dashboard/my-enroll-classes");
           }, 2000);
         } catch (enrollmentError) {
           console.error("Enrollment error:", enrollmentError);

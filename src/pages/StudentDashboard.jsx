@@ -24,7 +24,7 @@ export const StudentDashboard = () => {
   const navigationItems = [
     {
       name: "My Enrolled Classes",
-      path: "/student-dashboard/my-classes",
+      path: "/student-dashboard/my-enroll-classes",
       icon: FiBook,
     },
     {
