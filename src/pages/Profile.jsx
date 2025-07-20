@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   FiUser,
   FiMail,
@@ -12,11 +12,15 @@ import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { updateProfile } from "firebase/auth";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 export const Profile = () => {
   const { user, auth } = useContext(AuthContext);
   const toast = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [userRole, setUserRole] = useState("");
+  const [roleLoading, setRoleLoading] = useState(true);
+  const [userFromDB, setUserFromDB] = useState(null);
 
   const {
     register,
@@ -32,13 +36,51 @@ export const Profile = () => {
     },
   });
 
+  // Fetch user data from backend including photo URL
+  const fetchUserData = async () => {
+    if (!user?.uid) return;
+
+    try {
+      setRoleLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/users/${user.uid}`
+      );
+
+      if (response.data.success) {
+        setUserRole(response.data.user.role);
+        setUserFromDB(response.data.user);
+        // Update form with backend data
+        setValue("name", response.data.user.name || user?.displayName || "");
+        setValue("email", response.data.user.email || user?.email || "");
+        setValue(
+          "photoURL",
+          response.data.user.photoURL || user?.photoURL || ""
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUserRole("student"); // Default fallback
+      setUserFromDB(null);
+    } finally {
+      setRoleLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, [user]);
+
   React.useEffect(() => {
-    if (user) {
+    if (userFromDB) {
+      setValue("name", userFromDB.name || user?.displayName || "");
+      setValue("email", userFromDB.email || user?.email || "");
+      setValue("photoURL", userFromDB.photoURL || user?.photoURL || "");
+    } else if (user) {
       setValue("name", user.displayName || "");
       setValue("email", user.email || "");
       setValue("photoURL", user.photoURL || "");
     }
-  }, [user, setValue]);
+  }, [user, userFromDB, setValue]);
 
   const handleProfileUpdate = async (data) => {
     try {
@@ -47,8 +89,22 @@ export const Profile = () => {
         photoURL: data.photoURL,
       });
 
+      // Also update in backend if needed
+      try {
+        await axios.patch(`${import.meta.env.VITE_API}/users/${user.uid}`, {
+          name: data.name,
+          photoURL: data.photoURL,
+        });
+      } catch (backendError) {
+        console.log(
+          "Backend update not available, continuing with Firebase update"
+        );
+      }
+
       toast.success("Profile updated successfully!");
       setIsEditing(false);
+      // Refresh user data from backend
+      fetchUserData();
     } catch (error) {
       toast.error("Failed to update profile. Please try again.");
     }
@@ -57,10 +113,54 @@ export const Profile = () => {
   const handleCancelEdit = () => {
     setIsEditing(false);
     reset({
-      name: user?.displayName || "",
-      email: user?.email || "",
-      photoURL: user?.photoURL || "",
+      name: userFromDB?.name || user?.displayName || "",
+      email: userFromDB?.email || user?.email || "",
+      photoURL: userFromDB?.photoURL || user?.photoURL || "",
     });
+  };
+
+  // Get the correct photo URL (backend first, then Firebase)
+  const getPhotoURL = () => {
+    return (
+      userFromDB?.photoURL ||
+      user?.photoURL ||
+      "https://i.ibb.co/4wsPz9SL/profile-removebg-preview.webp"
+    );
+  };
+
+  // Get the correct display name
+  const getDisplayName = () => {
+    return userFromDB?.name || user?.displayName || "Student";
+  };
+
+  // Get role badge with proper styling
+  const getRoleBadge = (role) => {
+    switch (role) {
+      case "admin":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
+            Admin
+          </span>
+        );
+      case "teacher":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
+            Teacher
+          </span>
+        );
+      case "student":
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+            Student
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400">
+            User
+          </span>
+        );
+    }
   };
 
   return (
@@ -71,10 +171,7 @@ export const Profile = () => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="flex items-center space-x-6 mb-6 md:mb-0">
               <img
-                src={
-                  user?.photoURL ||
-                  "https://i.ibb.co/4wsPz9SL/profile-removebg-preview.webp"
-                }
+                src={getPhotoURL()}
                 alt="Profile"
                 className="w-24 h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600"
                 onError={(e) => {
@@ -84,10 +181,10 @@ export const Profile = () => {
               />
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                  {user?.displayName || "Student"}
+                  {getDisplayName()}
                 </h1>
                 <p className="text-gray-600 dark:text-gray-300 text-lg">
-                  {user?.email}
+                  {userFromDB?.email || user?.email}
                 </p>
               </div>
             </div>
@@ -141,7 +238,7 @@ export const Profile = () => {
                   <div className="flex items-center space-x-3">
                     <FiUser className="w-5 h-5 text-gray-400" />
                     <p className="text-base text-gray-900 dark:text-white">
-                      {user?.displayName || "Not provided"}
+                      {getDisplayName()}
                     </p>
                   </div>
                 </div>
@@ -153,7 +250,7 @@ export const Profile = () => {
                   <div className="flex items-center space-x-3">
                     <FiMail className="w-5 h-5 text-gray-400" />
                     <p className="text-base text-gray-900 dark:text-white">
-                      {user?.email}
+                      {userFromDB?.email || user?.email}
                     </p>
                   </div>
                 </div>
@@ -165,7 +262,9 @@ export const Profile = () => {
                   <div className="flex items-center space-x-3">
                     <FiCalendar className="w-5 h-5 text-gray-400" />
                     <p className="text-base text-gray-900 dark:text-white">
-                      {user?.metadata?.creationTime
+                      {userFromDB?.createdAt
+                        ? new Date(userFromDB.createdAt).toLocaleDateString()
+                        : user?.metadata?.creationTime
                         ? new Date(
                             user.metadata.creationTime
                           ).toLocaleDateString()
@@ -176,13 +275,20 @@ export const Profile = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Account Status
+                    Account Type
                   </label>
                   <div className="flex items-center space-x-3">
                     <FiSettings className="w-5 h-5 text-gray-400" />
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                      Active
-                    </span>
+                    {roleLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          Loading...
+                        </span>
+                      </div>
+                    ) : (
+                      getRoleBadge(userRole)
+                    )}
                   </div>
                 </div>
               </div>

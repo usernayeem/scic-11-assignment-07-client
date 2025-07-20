@@ -11,12 +11,40 @@ export const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
+  const [userFromDB, setUserFromDB] = useState(null);
   const dropdownRef = useRef(null);
 
   // Auth context
   const { user, Logout, loading } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
+
+  // Fetch user data from backend to get correct photo URL
+  const fetchUserData = async () => {
+    if (!user?.uid) return;
+
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/users/${user.uid}`
+      );
+
+      if (response.data.success) {
+        setUserFromDB(response.data.user);
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUserFromDB(null);
+    }
+  };
+
+  // Fetch user data when user changes
+  useEffect(() => {
+    if (user) {
+      fetchUserData();
+    } else {
+      setUserFromDB(null);
+    }
+  }, [user]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -43,6 +71,7 @@ export const Navbar = () => {
       await Logout();
       toast.success("Logged out successfully!");
       setIsDropdownOpen(false);
+      setUserFromDB(null);
       navigate("/");
     } catch (error) {
       toast.error("Logout failed. Please try again.");
@@ -89,6 +118,20 @@ export const Navbar = () => {
   const handleMobileDashboardClick = () => {
     setIsMobileMenuOpen(false);
     handleDashboardClick();
+  };
+
+  // Get the correct photo URL (backend first, then Firebase)
+  const getPhotoURL = () => {
+    return (
+      userFromDB?.photoURL ||
+      user?.photoURL ||
+      "https://i.ibb.co/4wsPz9SL/profile-removebg-preview.webp"
+    );
+  };
+
+  // Get the correct display name
+  const getDisplayName = () => {
+    return userFromDB?.name || user?.displayName || "User";
   };
 
   return (
@@ -149,10 +192,7 @@ export const Navbar = () => {
                   className="flex items-center space-x-2 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
                 >
                   <img
-                    src={
-                      user?.photoURL ||
-                      "https://i.ibb.co/4wsPz9SL/profile-removebg-preview.webp"
-                    }
+                    src={getPhotoURL()}
                     alt="Profile"
                     className="w-8 h-8 rounded-full object-cover"
                     onError={(e) => {
@@ -171,7 +211,7 @@ export const Navbar = () => {
                 {isDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                     <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                      <p className="font-medium truncate">{user.displayName}</p>
+                      <p className="font-medium truncate">{getDisplayName()}</p>
                       {user.email && (
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {user.email}
@@ -256,7 +296,7 @@ export const Navbar = () => {
               {user && (
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
                   <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Signed in as: {user.displayName}
+                    Signed in as: {getDisplayName()}
                   </div>
                   <button
                     onClick={handleMobileDashboardClick}
