@@ -6,6 +6,7 @@ import { HowItWorks } from "../components/HowItWorks";
 import { FAQ } from "../components/FAQ";
 import { PopularClasses } from "../components/PopularClasses";
 import { Feedback } from "../components/Feedback";
+import { Statistics } from "../components/Statistics";
 
 export const Home = () => {
   return (
@@ -14,6 +15,7 @@ export const Home = () => {
       <Partners />
       <PopularClasses />
       <Feedback />
+      <Statistics />
       <TeacherCTA />
       <HowItWorks />
       <FAQ />
