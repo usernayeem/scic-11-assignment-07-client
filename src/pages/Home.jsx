@@ -5,6 +5,7 @@ import { TeacherCTA } from "../components/TeacherCTA";
 import { HowItWorks } from "../components/HowItWorks";
 import { FAQ } from "../components/FAQ";
 import { PopularClasses } from "../components/PopularClasses";
+import { Feedback } from "../components/Feedback";
 
 export const Home = () => {
   return (
@@ -12,6 +13,7 @@ export const Home = () => {
       <Banner />
       <Partners />
       <PopularClasses />
+      <Feedback />
       <TeacherCTA />
       <HowItWorks />
       <FAQ />
