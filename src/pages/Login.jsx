@@ -194,12 +194,12 @@ export const Login = () => {
 
             {/* Forgot Password Link */}
             <div className="flex items-center justify-end">
-              <a
-                href="#"
+              <Link
+                to="/forgot-password"
                 className="text-sm text-[#5D5CDE] hover:text-[#4A4BC9] transition-colors duration-200"
               >
                 Forgot your password?
-              </a>
+              </Link>
             </div>
 
             {/* Submit Button */}

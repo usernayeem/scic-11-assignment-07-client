@@ -24,6 +24,7 @@ import { ClassDetails } from "../pages/ClassDetails";
 import { Payment } from "../pages/CheckoutForm";
 import { EnrolledClassDetails } from "../pages/EnrolledClassDetails";
 import { ClassDetailsTeacher } from "../pages/ClassDetailsTeacher";
+import { ForgotPassword } from "../pages/ForgotPassword";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
       },
       {
         path: "/teach",
