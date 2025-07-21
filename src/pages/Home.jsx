@@ -4,12 +4,14 @@ import { Partners } from "../components/Partners";
 import { TeacherCTA } from "../components/TeacherCTA";
 import { HowItWorks } from "../components/HowItWorks";
 import { FAQ } from "../components/FAQ";
+import { PopularClasses } from "../components/PopularClasses";
 
 export const Home = () => {
   return (
     <div>
       <Banner />
       <Partners />
+      <PopularClasses />
       <TeacherCTA />
       <HowItWorks />
       <FAQ />

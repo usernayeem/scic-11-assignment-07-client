@@ -444,7 +444,7 @@ export const Payment = () => {
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
             <div className="text-center mb-6">
               <div className="flex items-center justify-center w-16 h-16 bg-[#5D5CDE] bg-opacity-10 rounded-2xl mx-auto mb-4">
-                <MdOutlineSchool className="text-[#5D5CDE] text-2xl" />
+                <MdOutlineSchool className="text-white text-2xl" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                 Complete Payment

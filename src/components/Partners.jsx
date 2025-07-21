@@ -119,14 +119,6 @@ export const Partners = () => {
                   <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
                     {partner.description}
                   </p>
-
-                  {/* Partnership Benefits */}
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-                    <button className="flex items-center space-x-2 text-[#5D5CDE] hover:text-[#4A4BC9] font-medium transition-colors duration-200 group">
-                      <span>Learn more about this partnership</span>
-                      <FiExternalLink className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                    </button>
-                  </div>
                 </div>
               </div>
             );
