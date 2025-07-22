@@ -6,6 +6,9 @@ import {
   FiUserCheck,
   FiMail,
   FiUser,
+  FiChevronLeft,
+  FiChevronRight,
+  FiX,
 } from "react-icons/fi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import axios from "axios";
@@ -13,21 +16,41 @@ import { useToast } from "../contexts/ToastContext";
 
 export const Users = () => {
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState({});
+  const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const toast = useToast();
 
-  // Fetch all users
-  const fetchUsers = async () => {
+  // Fetch users with pagination
+  const fetchUsers = async (
+    page = currentPage,
+    limit = pageSize,
+    search = searchTerm
+  ) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API}/users`);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      if (search.trim()) {
+        params.append("search", search.trim());
+      }
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/users?${params}`
+      );
 
       if (response.data.success) {
         setUsers(response.data.users);
-        setFilteredUsers(response.data.users);
+        setTotalUsers(response.data.totalUsers || 0);
+        setTotalPages(response.data.totalPages || 0);
       } else {
         toast.error("Failed to fetch users");
       }
@@ -39,22 +62,63 @@ export const Users = () => {
     }
   };
 
-  // Handle search functionality
-  const handleSearch = (searchValue) => {
-    setSearchTerm(searchValue);
+  // Handle search submission
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const trimmedSearch = searchInput.trim();
+    setSearchTerm(trimmedSearch);
+    setCurrentPage(1); // Reset to first page when searching
+    fetchUsers(1, pageSize, trimmedSearch);
+  };
 
-    if (!searchValue.trim()) {
-      setFilteredUsers(users);
-      return;
+  // Handle search clear
+  const handleSearchClear = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setCurrentPage(1);
+    fetchUsers(1, pageSize, "");
+  };
+
+  // Handle Enter key press in search input
+  const handleSearchKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearchSubmit(e);
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchUsers(newPage, pageSize, searchTerm);
+    }
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+    fetchUsers(1, newPageSize, searchTerm);
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust start page if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    const filtered = users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchValue.toLowerCase())
-    );
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
 
-    setFilteredUsers(filtered);
+    return pageNumbers;
   };
 
   // Handle make admin
@@ -70,20 +134,8 @@ export const Users = () => {
       );
 
       if (response.data.success) {
-        // Update local state
-        const updatedUsers = users.map((user) =>
-          user.uid === uid ? { ...user, role: "admin" } : user
-        );
-
-        setUsers(updatedUsers);
-        setFilteredUsers(
-          updatedUsers.filter(
-            (user) =>
-              user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              user.email.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-        );
-
+        // Refresh the current page to show updated data
+        await fetchUsers(currentPage, pageSize, searchTerm);
         toast.success(`${userName} has been made an admin successfully!`);
       }
     } catch (error) {
@@ -158,7 +210,7 @@ export const Users = () => {
             </p>
           </div>
           <button
-            onClick={fetchUsers}
+            onClick={() => fetchUsers(currentPage, pageSize, searchTerm)}
             className="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
           >
             <FiRefreshCw className="w-4 h-4 mr-2" />
@@ -169,50 +221,80 @@ export const Users = () => {
 
       {/* Search Bar */}
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="relative max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <FiSearch className="h-5 w-5 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
-            placeholder="Search by name or email..."
-          />
-        </div>
-      </div>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Search Form */}
+          <form
+            onSubmit={handleSearchSubmit}
+            className="relative flex-1 max-w-md"
+          >
+            <div className="flex">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FiSearch className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  className="block w-full pl-10 pr-10 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-l-lg placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  placeholder="Search by name or email..."
+                />
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={handleSearchClear}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                  >
+                    <FiX className="h-5 w-5" />
+                  </button>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-[#5D5CDE] text-white rounded-r-lg hover:bg-[#4A4BC9] focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:ring-offset-2 transition-colors duration-200 flex items-center"
+              >
+                <FiSearch className="h-5 w-5" />
+              </button>
+            </div>
+          </form>
 
-      {/* Users Count */}
-      <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700/50">
-        <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
-          <span>Total Users: {users.length}</span>
-          <span>Showing: {filteredUsers.length}</span>
-          <span>
-            Admins: {users.filter((user) => user.role === "admin").length}
-          </span>
-          <span>
-            Teachers: {users.filter((user) => user.role === "teacher").length}
-          </span>
-          <span>
-            Students: {users.filter((user) => user.role === "student").length}
-          </span>
+          {/* Active Search Indicator */}
+          {searchTerm && (
+            <div className="flex items-center space-x-2 px-3 py-1 bg-[#5D5CDE]/10 dark:bg-[#5D5CDE]/20 rounded-lg">
+              <span className="text-sm text-[#5D5CDE] dark:text-[#5D5CDE]">
+                Searching: "{searchTerm}"
+              </span>
+              <button
+                onClick={handleSearchClear}
+                className="text-[#5D5CDE] hover:text-[#4A4BC9] transition-colors duration-200"
+              >
+                <FiX className="h-4 w-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Users Table */}
       <div className="overflow-x-auto">
-        {filteredUsers.length === 0 ? (
+        {users.length === 0 ? (
           <div className="px-6 py-12 text-center">
             {searchTerm ? (
               <>
                 <FiSearch className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
-                  No users found
+                  No users found for "{searchTerm}"
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Try adjusting your search criteria.
                 </p>
+                <button
+                  onClick={handleSearchClear}
+                  className="mt-4 bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200"
+                >
+                  Clear Search
+                </button>
               </>
             ) : (
               <>
@@ -248,7 +330,7 @@ export const Users = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredUsers.map((user) => (
+              {users.map((user) => (
                 <tr
                   key={user._id}
                   className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
@@ -271,9 +353,6 @@ export const Users = () => {
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {user.name || "No Name"}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          ID: {user.uid.slice(0, 8)}...
                         </div>
                       </div>
                     </div>
@@ -326,6 +405,84 @@ export const Users = () => {
             </tbody>
           </table>
         )}
+      </div>
+
+      {/* Pagination */}
+      <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+          {/* Left Side: Pagination Info and Page Size Selector */}
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            {/* Pagination Info */}
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              Showing {totalUsers > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{" "}
+              {Math.min(currentPage * pageSize, totalUsers)} of {totalUsers}{" "}
+              users
+            </div>
+
+            {/* Page Size Selector */}
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Show:
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+              >
+                <option value={5}>5 per page</option>
+                <option value={10}>10 per page</option>
+                <option value={15}>15 per page</option>
+                <option value={20}>20 per page</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Right Side: Pagination Controls */}
+          {totalPages > 1 ? (
+            <div className="flex items-center space-x-2">
+              {/* Previous Button */}
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                <FiChevronLeft className="w-4 h-4 mr-1" />
+                Previous
+              </button>
+
+              {/* Page Numbers */}
+              <div className="flex items-center space-x-1">
+                {getPageNumbers().map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                      currentPage === pageNum
+                        ? "bg-[#5D5CDE] text-white"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+
+              {/* Next Button */}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                Next
+                <FiChevronRight className="w-4 h-4 ml-1" />
+              </button>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {totalUsers <= pageSize ? "All users displayed" : "Page 1 of 1"}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
