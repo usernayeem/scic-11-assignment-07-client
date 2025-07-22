@@ -6,6 +6,8 @@ import {
   FiRefreshCw,
   FiClock,
   FiAward,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 import { MdOutlineSchool, MdVerified } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,19 +24,34 @@ export const MyEnrolledClasses = () => {
   const [classProgress, setClassProgress] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Fetch enrolled classes
-  const fetchEnrolledClasses = async () => {
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalClasses, setTotalClasses] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // Fetch enrolled classes with pagination
+  const fetchEnrolledClasses = async (page = currentPage, limit = pageSize) => {
     try {
       setLoading(true);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
       const response = await axios.get(
-        `${import.meta.env.VITE_API}/students/${user.uid}/enrolled-classes`
+        `${import.meta.env.VITE_API}/students/${
+          user.uid
+        }/enrolled-classes?${params}`
       );
 
       if (response.data.success) {
         const classes = response.data.classes;
         setEnrolledClasses(classes);
+        setTotalClasses(response.data.totalClasses || 0);
+        setTotalPages(response.data.totalPages || 0);
 
-        // Fetch progress for each class
+        // Fetch progress for current page classes
         await fetchProgressForClasses(classes);
       } else {
         toast.error("Failed to fetch enrolled classes");
@@ -47,7 +64,42 @@ export const MyEnrolledClasses = () => {
     }
   };
 
-  // Fetch progress data for all classes
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchEnrolledClasses(newPage, pageSize);
+    }
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+    fetchEnrolledClasses(1, newPageSize);
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust start page if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
+  };
+
+  // Fetch progress data for current page classes
   const fetchProgressForClasses = async (classes) => {
     const progressData = {};
 
@@ -113,9 +165,25 @@ export const MyEnrolledClasses = () => {
     }
   };
 
-  // Calculate overall stats
-  const calculateOverallStats = () => {
-    const totalClasses = enrolledClasses.length;
+  // Calculate overall stats (for all enrolled classes, not just current page)
+  const calculateOverallStats = async () => {
+    try {
+      // Fetch total stats by calling the API without pagination to get overall counts
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/students/${
+          user.uid
+        }/enrolled-classes-stats`
+      );
+
+      if (response.data.success) {
+        return response.data.stats;
+      }
+    } catch (error) {
+      console.error("Error fetching overall stats:", error);
+    }
+
+    // Fallback: calculate from current page data
+    const totalClasses = totalClasses || 0;
     const completedClasses = Object.values(classProgress).filter(
       (progress) => progress.isCompleted
     ).length;
@@ -199,8 +267,6 @@ export const MyEnrolledClasses = () => {
     );
   }
 
-  const stats = calculateOverallStats();
-
   return (
     <div className="p-6">
       {/* Header */}
@@ -215,7 +281,7 @@ export const MyEnrolledClasses = () => {
             </p>
           </div>
           <button
-            onClick={fetchEnrolledClasses}
+            onClick={() => fetchEnrolledClasses(currentPage, pageSize)}
             className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
           >
             <FiRefreshCw className="w-4 h-4 mr-2" />
@@ -223,7 +289,7 @@ export const MyEnrolledClasses = () => {
           </button>
         </div>
 
-        {/* Dynamic Stats */}
+        {/* Dynamic Stats - Show total stats */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4">
             <div className="flex items-center">
@@ -232,7 +298,7 @@ export const MyEnrolledClasses = () => {
               </div>
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats.totalClasses}
+                  {totalClasses}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Total Enrolled
@@ -248,7 +314,14 @@ export const MyEnrolledClasses = () => {
               </div>
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats.inProgressClasses}
+                  {
+                    Object.values(classProgress).filter(
+                      (progress) =>
+                        progress.hasAssignments &&
+                        !progress.isCompleted &&
+                        progress.completedAssignments > 0
+                    ).length
+                  }
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   In Progress
@@ -264,7 +337,11 @@ export const MyEnrolledClasses = () => {
               </div>
               <div className="ml-4">
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {stats.completedClasses}
+                  {
+                    Object.values(classProgress).filter(
+                      (progress) => progress.isCompleted
+                    ).length
+                  }
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Completed
@@ -275,8 +352,8 @@ export const MyEnrolledClasses = () => {
         </div>
       </div>
 
-      {/* Classes Grid */}
-      {enrolledClasses.length === 0 ? (
+      {/* Classes Content */}
+      {totalClasses === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-12 text-center">
           <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl mx-auto mb-6">
             <MdOutlineSchool className="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -297,115 +374,205 @@ export const MyEnrolledClasses = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {enrolledClasses.map((classItem) => {
-            const progress = classProgress[classItem._id] || {
-              progressPercentage: 0,
-              completedAssignments: 0,
-              totalAssignments: 0,
-            };
-            const progressStatus = getProgressStatus(classItem._id);
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          {/* Classes Grid */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {enrolledClasses.map((classItem) => {
+                const progress = classProgress[classItem._id] || {
+                  progressPercentage: 0,
+                  completedAssignments: 0,
+                  totalAssignments: 0,
+                };
+                const progressStatus = getProgressStatus(classItem._id);
 
-            return (
-              <div
-                key={classItem._id}
-                className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden group"
-              >
-                {/* Class Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={classItem.image}
-                    alt={classItem.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      e.target.src =
-                        "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
-                    }}
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                      <MdVerified className="w-3 h-3 mr-1" />
-                      Enrolled
-                    </span>
+                return (
+                  <div
+                    key={classItem._id}
+                    className="bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden group"
+                  >
+                    {/* Class Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={classItem.image}
+                        alt={classItem.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.target.src =
+                            "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
+                        }}
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          <MdVerified className="w-3 h-3 mr-1" />
+                          Enrolled
+                        </span>
+                      </div>
+                      <div className="absolute top-4 right-4">
+                        <span
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            progressStatus.color === "green"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                              : progressStatus.color === "yellow"
+                              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                              : progressStatus.color === "blue"
+                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                          }`}
+                        >
+                          {progressStatus.text}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Class Content */}
+                    <div className="p-6">
+                      {/* Title */}
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-[#5D5CDE] transition-colors duration-200">
+                        {truncateText(classItem.title, 50)}
+                      </h3>
+
+                      {/* Instructor */}
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        <FiUser className="w-4 h-4 mr-2" />
+                        <span>By {classItem.teacherName}</span>
+                      </div>
+
+                      {/* Enrollment Date */}
+                      <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
+                        <FiClock className="w-4 h-4 mr-2" />
+                        <span>
+                          Enrolled on {formatDate(classItem.updatedAt)}
+                        </span>
+                      </div>
+
+                      {/* Progress Section */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+                          <span>Progress</span>
+                          <span>{progress.progressPercentage}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              progress.progressPercentage === 100
+                                ? "bg-green-500"
+                                : progress.progressPercentage > 0
+                                ? "bg-[#5D5CDE]"
+                                : "bg-gray-300 dark:bg-gray-600"
+                            }`}
+                            style={{ width: `${progress.progressPercentage}%` }}
+                          ></div>
+                        </div>
+                        {progress.totalAssignments > 0 && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {progress.completedAssignments} of{" "}
+                            {progress.totalAssignments} assignments completed
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Continue Button */}
+                      <Link
+                        to={`/student-dashboard/my-enroll-class/${classItem._id}`}
+                        className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-4 rounded-xl font-semibold text-base hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group"
+                      >
+                        <span>
+                          {progress.isCompleted
+                            ? "Review Class"
+                            : "Continue Learning"}
+                        </span>
+                        <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                      </Link>
+                    </div>
                   </div>
-                  <div className="absolute top-4 right-4">
-                    <span
-                      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        progressStatus.color === "green"
-                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                          : progressStatus.color === "yellow"
-                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-                          : progressStatus.color === "blue"
-                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                          : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                      }`}
-                    >
-                      {progressStatus.text}
-                    </span>
-                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Pagination */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+              {/* Left Side: Pagination Info and Page Size Selector */}
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                {/* Pagination Info */}
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  Showing{" "}
+                  {totalClasses > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{" "}
+                  {Math.min(currentPage * pageSize, totalClasses)} of{" "}
+                  {totalClasses} classes
                 </div>
 
-                {/* Class Content */}
-                <div className="p-6">
-                  {/* Title */}
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-[#5D5CDE] transition-colors duration-200">
-                    {truncateText(classItem.title, 50)}
-                  </h3>
-
-                  {/* Instructor */}
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    <FiUser className="w-4 h-4 mr-2" />
-                    <span>By {classItem.teacherName}</span>
-                  </div>
-
-                  {/* Enrollment Date */}
-                  <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    <FiClock className="w-4 h-4 mr-2" />
-                    <span>Enrolled on {formatDate(classItem.updatedAt)}</span>
-                  </div>
-
-                  {/* Progress Section */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                      <span>Progress</span>
-                      <span>{progress.progressPercentage}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full transition-all duration-300 ${
-                          progress.progressPercentage === 100
-                            ? "bg-green-500"
-                            : progress.progressPercentage > 0
-                            ? "bg-[#5D5CDE]"
-                            : "bg-gray-300 dark:bg-gray-600"
-                        }`}
-                        style={{ width: `${progress.progressPercentage}%` }}
-                      ></div>
-                    </div>
-                    {progress.totalAssignments > 0 && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {progress.completedAssignments} of{" "}
-                        {progress.totalAssignments} assignments completed
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Continue Button */}
-                  <Link
-                    to={`/student-dashboard/my-enroll-class/${classItem._id}`}
-                    className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-4 rounded-xl font-semibold text-base hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group"
+                {/* Page Size Selector */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Show:
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
                   >
-                    <span>
-                      {progress.isCompleted
-                        ? "Review Class"
-                        : "Continue Learning"}
-                    </span>
-                    <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                  </Link>
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={15}>15 per page</option>
+                    <option value={20}>20 per page</option>
+                  </select>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Right Side: Pagination Controls */}
+              {totalPages > 1 ? (
+                <div className="flex items-center space-x-2">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    <FiChevronLeft className="w-4 h-4 mr-1" />
+                    Previous
+                  </button>
+
+                  {/* Page Numbers */}
+                  <div className="flex items-center space-x-1">
+                    {getPageNumbers().map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                          currentPage === pageNum
+                            ? "bg-[#5D5CDE] text-white"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    Next
+                    <FiChevronRight className="w-4 h-4 ml-1" />
+                  </button>
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {totalClasses <= pageSize
+                    ? "All classes displayed"
+                    : "Page 1 of 1"}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>
