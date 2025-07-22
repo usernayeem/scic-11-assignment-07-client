@@ -129,7 +129,11 @@ export const MyClassesTeacher = () => {
     try {
       setIsUploadingImage(true);
 
-      const response = await axios.post(
+      // Create a separate axios instance without authorization header for imgbb
+      const imgbbAxios = axios.create();
+      delete imgbbAxios.defaults.headers.common["Authorization"];
+
+      const response = await imgbbAxios.post(
         `https://api.imgbb.com/1/upload?key=${
           import.meta.env.VITE_IMGBB_API_KEY
         }`,

@@ -24,39 +24,20 @@ export const Statistics = () => {
     try {
       setLoading(true);
 
-      // Fetch all required data in parallel
-      const [usersResponse, classesResponse] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API}/users`),
-        axios.get(`${import.meta.env.VITE_API}/classes`),
-      ]);
+      // Fetch statistics from public endpoint (no authentication required)
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/public-statistics`
+      );
 
-      let totalUsers = 0;
-      let totalClasses = 0;
-      let totalEnrollments = 0;
-
-      // Calculate total users
-      if (usersResponse.data.success) {
-        totalUsers = usersResponse.data.users.length;
+      if (response.data.success) {
+        setStats({
+          totalUsers: response.data.statistics.totalUsers,
+          totalClasses: response.data.statistics.totalClasses,
+          totalEnrollments: response.data.statistics.totalEnrollments,
+        });
+      } else {
+        toast.error("Failed to load statistics");
       }
-
-      // Calculate total classes and enrollments
-      if (classesResponse.data.success) {
-        const approvedClasses = classesResponse.data.classes.filter(
-          (cls) => cls.status === "approved"
-        );
-        totalClasses = approvedClasses.length;
-
-        // Calculate total enrollments across all approved classes
-        totalEnrollments = approvedClasses.reduce((sum, cls) => {
-          return sum + (cls.enrolledStudents?.length || 0);
-        }, 0);
-      }
-
-      setStats({
-        totalUsers,
-        totalClasses,
-        totalEnrollments,
-      });
     } catch (error) {
       console.error("Error fetching statistics:", error);
       toast.error("Failed to load statistics");
