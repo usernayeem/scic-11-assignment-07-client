@@ -15,6 +15,8 @@ import {
   FiMail,
   FiBook,
   FiUpload,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 import { MdPending, MdVerified } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +38,12 @@ export const MyClassesTeacher = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updatedImageUrl, setUpdatedImageUrl] = useState("");
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalClasses, setTotalClasses] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
   // Image upload states
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -52,16 +60,23 @@ export const MyClassesTeacher = () => {
     setError,
   } = useForm();
 
-  // Fetch teacher's classes
-  const fetchClasses = async () => {
+  // Fetch teacher's classes with pagination
+  const fetchClasses = async (page = currentPage, limit = pageSize) => {
     try {
       setLoading(true);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
       const response = await axios.get(
-        `${import.meta.env.VITE_API}/classes/teacher/${user?.uid}`
+        `${import.meta.env.VITE_API}/classes/teacher/${user?.uid}?${params}`
       );
 
       if (response.data.success) {
         setClasses(response.data.classes);
+        setTotalClasses(response.data.totalClasses || 0);
+        setTotalPages(response.data.totalPages || 0);
       } else {
         toast.error("Failed to fetch classes");
       }
@@ -71,6 +86,41 @@ export const MyClassesTeacher = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchClasses(newPage, pageSize);
+    }
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+    fetchClasses(1, newPageSize);
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust start page if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
   };
 
   // Handle image selection
@@ -200,7 +250,7 @@ export const MyClassesTeacher = () => {
       if (response.data.success) {
         toast.success("Class updated successfully!");
         setIsUpdateModalOpen(false);
-        fetchClasses();
+        fetchClasses(currentPage, pageSize);
         reset();
         setUpdatedImageUrl("");
         setSelectedImage(null);
@@ -241,7 +291,18 @@ export const MyClassesTeacher = () => {
 
         if (response.data.success) {
           toast.success("Class deleted successfully!");
-          fetchClasses(); // Refresh the classes list
+
+          // Check if we need to adjust current page after deletion
+          const newTotal = totalClasses - 1;
+          const newTotalPages = Math.ceil(newTotal / pageSize);
+
+          // If current page is now empty and not the first page, go to previous page
+          if (currentPage > 1 && currentPage > newTotalPages) {
+            setCurrentPage(currentPage - 1);
+            fetchClasses(currentPage - 1, pageSize);
+          } else {
+            fetchClasses(currentPage, pageSize);
+          }
 
           Swal.fire({
             title: "Deleted!",
@@ -337,7 +398,7 @@ export const MyClassesTeacher = () => {
             </p>
           </div>
           <button
-            onClick={fetchClasses}
+            onClick={() => fetchClasses(currentPage, pageSize)}
             className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
           >
             <FiRefreshCw className="w-4 h-4 mr-2" />
@@ -365,106 +426,187 @@ export const MyClassesTeacher = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {classes.map((classItem) => (
-            <div
-              key={classItem._id}
-              className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
-            >
-              {/* Class Image */}
-              <div className="relative h-48">
-                <img
-                  src={classItem.image}
-                  alt={classItem.title}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
-                  }}
-                />
-                <div className="absolute top-4 right-4">
-                  {getStatusBadge(classItem.status)}
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+          {/* Classes Grid */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {classes.map((classItem) => (
+                <div
+                  key={classItem._id}
+                  className="bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden"
+                >
+                  {/* Class Image */}
+                  <div className="relative h-48">
+                    <img
+                      src={classItem.image}
+                      alt={classItem.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src =
+                          "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
+                      }}
+                    />
+                    <div className="absolute top-4 right-4">
+                      {getStatusBadge(classItem.status)}
+                    </div>
+                  </div>
+
+                  {/* Class Content */}
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 truncate">
+                      {classItem.title}
+                    </h3>
+
+                    {/* Teacher Info */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <FiUser className="w-4 h-4 mr-2" />
+                        <span>{classItem.teacherName}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                        <FiMail className="w-4 h-4 mr-2" />
+                        <span>{classItem.teacherEmail}</span>
+                      </div>
+                    </div>
+
+                    {/* Price */}
+                    <div className="flex items-center mb-4">
+                      <span className="text-2xl font-bold text-[#5D5CDE]">
+                        ${classItem.price}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-5">
+                      {classItem.description}
+                    </p>
+
+                    {/* Created Date */}
+                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-6">
+                      <FiClock className="w-4 h-4 mr-1" />
+                      <span>
+                        Created:{" "}
+                        {new Date(classItem.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col space-y-3">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleUpdate(classItem)}
+                          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
+                        >
+                          <FiEdit3 className="w-4 h-4" />
+                          <span>Update</span>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(classItem)}
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
+                        >
+                          <FiTrash2 className="w-4 h-4" />
+                          <span>Delete</span>
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => handleSeeDetails(classItem._id)}
+                        disabled={classItem.status !== "approved"}
+                        className={`w-full px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
+                          classItem.status === "approved"
+                            ? "bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                        }`}
+                      >
+                        <FiEye className="w-4 h-4" />
+                        <span>See Details</span>
+                      </button>
+                      {classItem.status !== "approved" && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                          Details available after admin approval
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Pagination */}
+
+          <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+              {/* Left Side: Pagination Info and Page Size Selector */}
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                {/* Pagination Info */}
+                <div className="text-sm text-gray-600 dark:text-gray-300">
+                  Showing{" "}
+                  {totalClasses > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{" "}
+                  {Math.min(currentPage * pageSize, totalClasses)} of{" "}
+                  {totalClasses} classes
+                </div>
+
+                {/* Page Size Selector */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Show:
+                  </span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) =>
+                      handlePageSizeChange(Number(e.target.value))
+                    }
+                    className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                  >
+                    <option value={5}>5 per page</option>
+                    <option value={10}>10 per page</option>
+                    <option value={15}>15 per page</option>
+                    <option value={20}>20 per page</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Class Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 line-clamp-2">
-                  {classItem.title}
-                </h3>
+              {/* Right Side: Pagination Controls */}
+              <div className="flex items-center space-x-2">
+                {/* Previous Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  <FiChevronLeft className="w-4 h-4 mr-1" />
+                  Previous
+                </button>
 
-                {/* Teacher Info */}
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <FiUser className="w-4 h-4 mr-2" />
-                    <span>{classItem.teacherName}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                    <FiMail className="w-4 h-4 mr-2" />
-                    <span>{classItem.teacherEmail}</span>
-                  </div>
-                </div>
-
-                {/* Price */}
-                <div className="flex items-center mb-4">
-                  <span className="text-2xl font-bold text-[#5D5CDE]">
-                    ${classItem.price}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
-                  {classItem.description}
-                </p>
-
-                {/* Created Date */}
-                <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-6">
-                  <FiClock className="w-4 h-4 mr-1" />
-                  <span>
-                    Created:{" "}
-                    {new Date(classItem.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col space-y-3">
-                  <div className="flex space-x-2">
+                {/* Page Numbers */}
+                <div className="flex items-center space-x-1">
+                  {getPageNumbers().map((pageNum) => (
                     <button
-                      onClick={() => handleUpdate(classItem)}
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                        currentPage === pageNum
+                          ? "bg-[#5D5CDE] text-white"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
                     >
-                      <FiEdit3 className="w-4 h-4" />
-                      <span>Update</span>
+                      {pageNum}
                     </button>
-                    <button
-                      onClick={() => handleDelete(classItem)}
-                      className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <FiTrash2 className="w-4 h-4" />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                  <button
-                    onClick={() => handleSeeDetails(classItem._id)}
-                    disabled={classItem.status !== "approved"}
-                    className={`w-full px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 ${
-                      classItem.status === "approved"
-                        ? "bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                    }`}
-                  >
-                    <FiEye className="w-4 h-4" />
-                    <span>See Details</span>
-                  </button>
-                  {classItem.status !== "approved" && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                      Details available after admin approval
-                    </p>
-                  )}
+                  ))}
                 </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  Next
+                  <FiChevronRight className="w-4 h-4 ml-1" />
+                </button>
               </div>
             </div>
-          ))}
+          </div>
         </div>
       )}
 
