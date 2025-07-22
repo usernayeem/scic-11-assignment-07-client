@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 
@@ -10,6 +10,7 @@ export const Login = () => {
   const { Login, googleAuth } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // React Hook Form setup
   const {
@@ -50,7 +51,7 @@ export const Login = () => {
     try {
       await Login(data.email, data.password);
       toast.success("Login successful!");
-      navigate("/");
+      navigate(location.state || "/");
     } catch (error) {
       if (error.code === "auth/user-not-found") {
         toast.error("No account found with this email.");
@@ -71,7 +72,7 @@ export const Login = () => {
     try {
       await googleAuth();
       toast.success("Google login successful!");
-      navigate("/");
+      navigate(location.state || "/");
     } catch (error) {
       toast.error("Google login failed. Please try again.");
     } finally {

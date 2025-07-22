@@ -10,7 +10,7 @@ import {
   FiArrowRight,
 } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import { updateProfile } from "firebase/auth";
@@ -20,6 +20,7 @@ export const Register = () => {
   const { registerUser, googleAuth } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // React Hook Form setup
   const {
@@ -81,7 +82,7 @@ export const Register = () => {
       await saveUserToDatabase(userCredential.user, data);
 
       toast.success("Registration successful!");
-      navigate("/");
+      navigate(location.state || "/");
     } catch (error) {
       if (error.code === "auth/email-already-in-use") {
         toast.error("This email is already registered.");
@@ -107,7 +108,7 @@ export const Register = () => {
       });
 
       toast.success("Google registration successful!");
-      navigate("/");
+      navigate(location.state || "/");
     } catch (error) {
       toast.error("Google registration failed. Please try again.");
     } finally {
