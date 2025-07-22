@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   FiUser,
@@ -8,8 +8,11 @@ import {
   FiGrid,
   FiCheckCircle,
   FiArrowRight,
+  FiClock,
+  FiXCircle,
+  FiRefreshCw,
 } from "react-icons/fi";
-import { MdOutlineSchool } from "react-icons/md";
+import { MdOutlineSchool, MdVerified } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
@@ -21,6 +24,11 @@ export const TeachOnEduManage = () => {
   const navigate = useNavigate();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicationStatus, setApplicationStatus] = useState(null);
+  const [userRole, setUserRole] = useState("student");
+  const [loading, setLoading] = useState(true);
+  const [isResubmitting, setIsResubmitting] = useState(false);
+  const [applicationData, setApplicationData] = useState(null);
 
   // React Hook Form setup
   const {
@@ -80,6 +88,50 @@ export const TeachOnEduManage = () => {
     },
   };
 
+  // Check user role and application status
+  const checkUserStatus = async () => {
+    try {
+      setLoading(true);
+
+      // Get user role
+      const userResponse = await axios.get(
+        `${import.meta.env.VITE_API}/users/${user.uid}`
+      );
+
+      if (userResponse.data.success) {
+        setUserRole(userResponse.data.user.role);
+      }
+
+      // Check for existing teacher application
+      const applicationResponse = await axios.get(
+        `${import.meta.env.VITE_API}/teacher-applications`
+      );
+
+      if (applicationResponse.data.success) {
+        // Find application for current user
+        const userApplication = applicationResponse.data.applications.find(
+          (app) => app.uid === user.uid
+        );
+
+        if (userApplication) {
+          setApplicationStatus(userApplication.status);
+          setApplicationData(userApplication);
+        }
+      }
+    } catch (error) {
+      console.error("Error checking user status:", error);
+      toast.error("Failed to load user status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      checkUserStatus();
+    }
+  }, [user]);
+
   // Function to submit teacher application to database
   const submitTeacherApplication = async (applicationData) => {
     try {
@@ -94,12 +146,36 @@ export const TeachOnEduManage = () => {
     }
   };
 
+  // Handle resubmission after rejection
+  const handleResubmit = async () => {
+    setIsResubmitting(true);
+    try {
+      // Update the existing application status back to pending
+      await axios.patch(
+        `${import.meta.env.VITE_API}/teacher-applications/${
+          applicationData._id
+        }`,
+        { status: "pending" }
+      );
+
+      setApplicationStatus("pending");
+      toast.success(
+        "Application resubmitted successfully! We will review it again."
+      );
+    } catch (error) {
+      console.error("Error resubmitting application:", error);
+      toast.error("Failed to resubmit application. Please try again.");
+    } finally {
+      setIsResubmitting(false);
+    }
+  };
+
   // Form submission handler
   const onSubmit = async (data) => {
     setIsSubmitting(true);
 
     try {
-      const applicationData = {
+      const applicationPayload = {
         uid: user.uid,
         name: data.name,
         email: user.email,
@@ -111,7 +187,7 @@ export const TeachOnEduManage = () => {
         appliedAt: new Date(),
       };
 
-      await submitTeacherApplication(applicationData);
+      await submitTeacherApplication(applicationPayload);
 
       // Reset form
       reset({
@@ -122,17 +198,17 @@ export const TeachOnEduManage = () => {
         category: "",
       });
 
+      // Update local state to show pending status
+      setApplicationStatus("pending");
+
       toast.success(
         "Application submitted successfully! We will review your application and get back to you soon."
       );
-
-      // Redirect to home page after successful submission
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
     } catch (error) {
       if (error.response?.status === 409) {
         toast.error("You have already submitted a teaching application.");
+        // Refresh the status to show current application
+        checkUserStatus();
       } else if (error.response?.status === 400) {
         toast.error("Please check all required fields and try again.");
       } else {
@@ -143,6 +219,227 @@ export const TeachOnEduManage = () => {
     }
   };
 
+  // Format category and experience
+  const formatText = (text) => {
+    return text
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+            <div className="flex items-center justify-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5D5CDE]"></div>
+              <span className="text-gray-600 dark:text-gray-300">
+                Loading your application status...
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if user is already a teacher
+  if (userRole === "teacher") {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900 rounded-2xl mx-auto mb-6">
+              <MdVerified className="text-green-600 dark:text-green-400 text-2xl" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Welcome, Teacher!
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
+              Congratulations! You are already an approved instructor on
+              EduManage. Start creating and managing your courses from your
+              teacher dashboard.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <div className="inline-block mb-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                <MdVerified className="text-white text-3xl" />
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              You're All Set!
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">
+              Your teaching application has been approved. You can now create
+              classes and start your teaching journey with EduManage.
+            </p>
+
+            <button
+              onClick={() => navigate("/teacher-dashboard")}
+              className="bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-8 rounded-xl font-semibold text-lg hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center justify-center space-x-3 mx-auto shadow-lg hover:shadow-xl hover:-translate-y-1"
+            >
+              <span>Go to Teacher Dashboard</span>
+              <FiArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show pending status
+  if (applicationStatus === "pending") {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-2xl mx-auto mb-6">
+              <FiClock className="text-yellow-600 dark:text-yellow-400 text-2xl" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Application Under Review
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
+              Thank you for your interest in teaching on EduManage! Your
+              application is currently being reviewed by our team.
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+            <div className="text-center mb-6">
+              <div className="inline-block mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto">
+                  <FiClock className="text-white text-2xl animate-pulse" />
+                </div>
+              </div>
+
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                Your Application Details
+              </h3>
+
+              {applicationData && (
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-6 text-left space-y-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      Course Title:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {applicationData.title}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      Category:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {formatText(applicationData.category)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      Experience:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {formatText(applicationData.experience)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      Applied Date:
+                    </span>
+                    <span className="text-gray-900 dark:text-white">
+                      {new Date(applicationData.appliedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                      Status:
+                    </span>
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                      <FiClock className="w-4 h-4 mr-1" />
+                      Pending Review
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <p className="text-gray-600 dark:text-gray-300 mt-6">
+                We typically review applications within 2-3 business days.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show rejected status with resubmit option
+  if (applicationStatus === "rejected") {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900 rounded-2xl mx-auto mb-6">
+              <FiXCircle className="text-red-600 dark:text-red-400 text-2xl" />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Application Not Approved
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
+              Unfortunately, your teaching application was not approved at this
+              time. But don't worry - you can submit a new application!
+            </p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <div className="inline-block mb-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-red-400 to-red-600 rounded-full flex items-center justify-center mx-auto">
+                <FiXCircle className="text-white text-3xl" />
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Application Status: Rejected
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-8">
+              We appreciate your interest in teaching with us. While your
+              current application wasn't approved, we encourage you to review
+              our guidelines and submit a new application when you're ready.
+            </p>
+
+            <button
+              onClick={handleResubmit}
+              disabled={isResubmitting}
+              className="bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-8 rounded-xl font-semibold text-lg hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center justify-center space-x-3 mx-auto shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isResubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <FiRefreshCw className="w-5 h-5" />
+                  <span>Submit New Application</span>
+                </>
+              )}
+            </button>
+
+            <p className="text-gray-500 dark:text-gray-400 mt-4 text-sm">
+              This will allow you to submit a new teaching application
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show application form (default state)
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
