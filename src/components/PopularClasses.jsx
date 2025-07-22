@@ -31,7 +31,7 @@ export const PopularClasses = () => {
       // Try the popular classes endpoint first
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API}/classes/popular`
+          `${import.meta.env.VITE_API}/popular-classes`
         );
 
         if (response.data.success && response.data.classes.length > 0) {
