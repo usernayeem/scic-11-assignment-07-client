@@ -148,7 +148,7 @@ export const TeacherRoute = ({ children }) => {
               Access Restricted
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              Only teachers can access this page. Contact an admin if you think
+              This page link is only for teacher. Contact an admin if you think
               this is wrong.
             </p>
             <div className="space-y-2">

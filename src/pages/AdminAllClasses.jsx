@@ -10,6 +10,8 @@ import {
   FiActivity,
   FiUsers,
   FiFileText,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 import { MdVerified, MdPending } from "react-icons/md";
 import axios from "axios";
@@ -22,16 +24,29 @@ export const AdminAllClasses = () => {
   const [isProgressModalOpen, setIsProgressModalOpen] = useState(false);
   const [selectedClassProgress, setSelectedClassProgress] = useState(null);
   const [progressLoading, setProgressLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [totalClasses, setTotalClasses] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const toast = useToast();
 
-  // Fetch all classes
-  const fetchClasses = async () => {
+  // Fetch classes with pagination
+  const fetchClasses = async (page = currentPage, limit = pageSize) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API}/classes`);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+      });
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/classes?${params}`
+      );
 
       if (response.data.success) {
         setClasses(response.data.classes);
+        setTotalClasses(response.data.totalClasses || 0);
+        setTotalPages(response.data.totalPages || 0);
       } else {
         toast.error("Failed to fetch classes");
       }
@@ -41,6 +56,41 @@ export const AdminAllClasses = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle page change
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+      fetchClasses(newPage, pageSize);
+    }
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+    fetchClasses(1, newPageSize);
+  };
+
+  // Generate page numbers for pagination
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 5;
+
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    // Adjust start page if we're near the end
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    return pageNumbers;
   };
 
   // Fetch progress data for a class
@@ -79,15 +129,8 @@ export const AdminAllClasses = () => {
       );
 
       if (response.data.success) {
-        // Update local state
-        setClasses((prev) =>
-          prev.map((cls) =>
-            cls._id === classId
-              ? { ...cls, status: "approved", updatedAt: new Date() }
-              : cls
-          )
-        );
-
+        // Refresh the current page to show updated data
+        await fetchClasses(currentPage, pageSize);
         toast.success(`Class "${className}" approved successfully!`);
       }
     } catch (error) {
@@ -109,15 +152,8 @@ export const AdminAllClasses = () => {
       );
 
       if (response.data.success) {
-        // Update local state
-        setClasses((prev) =>
-          prev.map((cls) =>
-            cls._id === classId
-              ? { ...cls, status: "rejected", updatedAt: new Date() }
-              : cls
-          )
-        );
-
+        // Refresh the current page to show updated data
+        await fetchClasses(currentPage, pageSize);
         toast.success(`Class "${className}" rejected`);
       }
     } catch (error) {
@@ -247,7 +283,7 @@ export const AdminAllClasses = () => {
               </p>
             </div>
             <button
-              onClick={fetchClasses}
+              onClick={() => fetchClasses(currentPage, pageSize)}
               className="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
             >
               <FiRefreshCw className="w-4 h-4 mr-2" />
@@ -259,18 +295,11 @@ export const AdminAllClasses = () => {
         {/* Classes Count */}
         <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700/50">
           <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
-            <span>Total Classes: {classes.length}</span>
+            <span>Total Classes: {totalClasses}</span>
             <span>
-              Pending:{" "}
-              {classes.filter((cls) => cls.status === "pending").length}
-            </span>
-            <span>
-              Approved:{" "}
-              {classes.filter((cls) => cls.status === "approved").length}
-            </span>
-            <span>
-              Rejected:{" "}
-              {classes.filter((cls) => cls.status === "rejected").length}
+              Showing {totalClasses > 0 ? (currentPage - 1) * pageSize + 1 : 0}{" "}
+              to {Math.min(currentPage * pageSize, totalClasses)} of{" "}
+              {totalClasses} classes
             </span>
           </div>
         </div>
@@ -438,6 +467,87 @@ export const AdminAllClasses = () => {
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* Pagination */}
+        <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            {/* Left Side: Pagination Info and Page Size Selector */}
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              {/* Pagination Info */}
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                Showing{" "}
+                {totalClasses > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{" "}
+                {Math.min(currentPage * pageSize, totalClasses)} of{" "}
+                {totalClasses} classes
+              </div>
+
+              {/* Page Size Selector */}
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  Show:
+                </span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
+                >
+                  <option value={5}>5 per page</option>
+                  <option value={10}>10 per page</option>
+                  <option value={15}>15 per page</option>
+                  <option value={20}>20 per page</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Right Side: Pagination Controls */}
+            {totalPages > 1 ? (
+              <div className="flex items-center space-x-2">
+                {/* Previous Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  <FiChevronLeft className="w-4 h-4 mr-1" />
+                  Previous
+                </button>
+
+                {/* Page Numbers */}
+                <div className="flex items-center space-x-1">
+                  {getPageNumbers().map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+                        currentPage === pageNum
+                          ? "bg-[#5D5CDE] text-white"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                >
+                  Next
+                  <FiChevronRight className="w-4 h-4 ml-1" />
+                </button>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {totalClasses <= pageSize
+                  ? "All classes displayed"
+                  : "Page 1 of 1"}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

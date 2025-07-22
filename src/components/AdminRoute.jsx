@@ -148,7 +148,7 @@ export const AdminRoute = ({ children }) => {
               Admin Access Required
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              This page is only for admins. You don't have permission to view
+              This page link is only for admins. You don't have permission to view
               this area.
             </p>
             <div className="space-y-2">

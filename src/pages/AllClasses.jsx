@@ -27,7 +27,7 @@ export const AllClasses = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(5);
   const [totalClasses, setTotalClasses] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -359,9 +359,9 @@ export const AllClasses = () => {
                   onChange={(e) => handlePageSizeChange(Number(e.target.value))}
                   className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200"
                 >
-                  <option value={8}>8 per page</option>
-                  <option value={12}>12 per page</option>
-                  <option value={16}>16 per page</option>
+                  <option value={5}>5 per page</option>
+                  <option value={10}>10 per page</option>
+                  <option value={15}>15 per page</option>
                   <option value={20}>20 per page</option>
                 </select>
               </div>
