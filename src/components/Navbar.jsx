@@ -157,7 +157,7 @@ export const Navbar = () => {
                 Home
               </a>
               <Link
-                to="/all-class"
+                to="/all-classes"
                 href="#"
                 className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
               >

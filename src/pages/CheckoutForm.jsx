@@ -42,7 +42,7 @@ const CheckoutForm = ({ classData, amount, onSuccess }) => {
     style: {
       base: {
         fontSize: "16px",
-        color: "#424770",
+        color: "#808080",
         "::placeholder": {
           color: "#aab7c4",
         },
@@ -290,7 +290,7 @@ export const Payment = () => {
       fetchClassData();
     } else {
       toast.error("No class information provided");
-      navigate("/all-class");
+      navigate("/all-classes");
     }
   }, [id, location.state]);
 
@@ -306,7 +306,7 @@ export const Payment = () => {
       }
     } catch (error) {
       toast.error("Failed to load class information");
-      navigate("/all-class");
+      navigate("/all-classes");
     } finally {
       setLoading(false);
     }

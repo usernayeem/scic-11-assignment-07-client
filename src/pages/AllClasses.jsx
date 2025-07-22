@@ -14,7 +14,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
 import axios from "axios";
 
-export const AllClass = () => {
+export const AllClasses = () => {
   const { user } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
@@ -236,7 +236,7 @@ export const AllClass = () => {
 
                   {/* Enroll Button - FIXED: Changed classId to classItem._id */}
                   <Link
-                    to={`/all-class/${classItem._id}`}
+                    to={`/all-classes/${classItem._id}`}
                     className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-4 rounded-xl font-semibold text-base hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group"
                   >
                     <span>Enroll Now</span>

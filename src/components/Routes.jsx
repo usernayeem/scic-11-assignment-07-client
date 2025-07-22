@@ -7,11 +7,11 @@ import { Login } from "../pages/Login";
 import { NotFound } from "../pages/NotFound";
 import { TeachOnEduManage } from "../pages/TeachOnEduManage";
 import { StudentDashboard } from "../pages/StudentDashboard";
-import { MyEnrollClasses } from "../pages/MyEnrollClasses";
+import { MyEnrolledClasses } from "../pages/MyEnrolledClasses";
 import { Profile } from "../pages/Profile";
 import { TeacherDashboard } from "../pages/TeacherDashboard";
 import { AddClass } from "../pages/AddClass";
-import { MyClasses } from "../pages/MyClasses";
+import { MyClassesTeacher } from "../pages/MyClassesTeacher";
 import { AdminDashboard } from "../pages/AdminDashboard";
 import { TeacherRequest } from "../pages/TeacherRequest";
 import { Users } from "../pages/Users";
@@ -19,7 +19,7 @@ import { AdminAllClasses } from "../pages/AdminAllClasses";
 import { PrivateRoute } from "./PrivateRoutes";
 import { TeacherRoute } from "./TeacherRoute";
 import { AdminRoute } from "./AdminRoute";
-import { AllClass } from "../pages/AllClass";
+import { AllClasses } from "../pages/AllClasses";
 import { ClassDetails } from "../pages/ClassDetails";
 import { Payment } from "../pages/CheckoutForm";
 import { EnrolledClassDetails } from "../pages/EnrolledClassDetails";
@@ -56,15 +56,15 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/all-class",
+        path: "/all-classes",
         element: (
           <PrivateRoute>
-            <AllClass />
+            <AllClasses />
           </PrivateRoute>
         ),
       },
       {
-        path: "/all-class/:id",
+        path: "/all-classes/:id",
         element: (
           <PrivateRoute>
             <ClassDetails />
@@ -93,7 +93,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "my-enroll-classes",
-            element: <MyEnrollClasses />,
+            element: <MyEnrolledClasses />,
           },
           {
             path: "my-enroll-class/:id",
@@ -125,7 +125,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "my-classes",
-            element: <MyClasses />,
+            element: <MyClassesTeacher />,
           },
           {
             path: "my-classes/:id",

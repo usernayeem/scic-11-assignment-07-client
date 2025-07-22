@@ -163,7 +163,7 @@ export const PopularClasses = () => {
               courses!
             </p>
             <Link
-              to="/all-class"
+              to="/all-classes"
               className="inline-flex items-center bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-3 rounded-xl font-semibold transition-colors duration-200 space-x-2"
             >
               <span>Browse All Classes</span>
@@ -302,7 +302,7 @@ export const PopularClasses = () => {
 
                       {/* Enroll Button */}
                       <Link
-                        to={`/all-class/${classItem._id}`}
+                        to={`/all-classes/${classItem._id}`}
                         className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-4 rounded-xl font-semibold text-sm hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl group/btn"
                       >
                         <span>Enroll Now</span>
@@ -336,7 +336,7 @@ export const PopularClasses = () => {
         {/* View All Classes Link */}
         <div className="text-center mt-12">
           <Link
-            to="/all-class"
+            to="/all-classes"
             className="inline-flex items-center bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-8 py-3 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-[#5D5CDE] hover:text-[#5D5CDE] transition-all duration-200 shadow-lg hover:shadow-xl space-x-2"
           >
             <span>Explore All Classes</span>
