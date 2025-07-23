@@ -81,7 +81,7 @@ export const HowItWorks = () => {
                   )}
 
                   {/* Step Card */}
-                  <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 relative border border-gray-100 dark:border-gray-700">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 relative border border-gray-100 dark:border-gray-700">
                     {/* Step Number Circle */}
                     <div
                       className={`absolute -top-4 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-gradient-to-r ${step.gradient} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg`}

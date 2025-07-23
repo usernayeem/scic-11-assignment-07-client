@@ -166,7 +166,7 @@ export const Statistics = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] rounded-full opacity-10 scale-110"></div>
 
               {/* Main Image Container */}
-              <div className="relative bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700">
+              <div className="relative bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-200 dark:border-gray-700">
                 <div className="text-center space-y-6">
                   {/* Illustration Icons */}
                   <div className="flex items-center justify-center space-x-4 mb-8">

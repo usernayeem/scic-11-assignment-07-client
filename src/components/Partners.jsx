@@ -67,7 +67,7 @@ export const Partners = () => {
   ];
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
@@ -79,10 +79,6 @@ export const Partners = () => {
             innovative companies to provide the best learning experience and
             career opportunities for our students.
           </p>
-          <div className="flex items-center justify-center space-x-2 text-[#5D5CDE] font-semibold">
-            <span>Building stronger educational ecosystems together</span>
-            <FiExternalLink className="w-5 h-5" />
-          </div>
         </div>
 
         {/* Partners Grid */}
@@ -92,7 +88,7 @@ export const Partners = () => {
             return (
               <div
                 key={partner.id}
-                className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-1"
+                className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group hover:-translate-y-1"
               >
                 {/* Partner Logo Section */}
                 <div className="p-6 border-b border-gray-100 dark:border-gray-700">
