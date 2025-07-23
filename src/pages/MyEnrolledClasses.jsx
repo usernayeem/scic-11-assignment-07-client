@@ -229,12 +229,6 @@ export const MyEnrolledClasses = () => {
     return { status: "not-started", text: "Not Started", color: "gray" };
   };
 
-  // Truncate text helper
-  const truncateText = (text, maxLength) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
-  };
-
   // Format date helper
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -426,8 +420,8 @@ export const MyEnrolledClasses = () => {
                     {/* Class Content */}
                     <div className="p-6">
                       {/* Title */}
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-[#5D5CDE] transition-colors duration-200">
-                        {truncateText(classItem.title, 50)}
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 line-clamp-2 group-hover:text-[#5D5CDE] transition-colors duration-200 truncate">
+                        {classItem.title}
                       </h3>
 
                       {/* Instructor */}
