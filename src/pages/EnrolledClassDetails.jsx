@@ -14,6 +14,7 @@ import {
   FiCheckCircle,
   FiClock,
   FiTarget,
+  FiMenu,
 } from "react-icons/fi";
 import { MdVerified, MdOutlineSchool, MdRateReview } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
@@ -36,6 +37,7 @@ export const EnrolledClassDetails = () => {
   const [isTerModalOpen, setIsTerModalOpen] = useState(false);
   const [terSubmitting, setTerSubmitting] = useState(false);
   const [rating, setRating] = useState(0);
+  const [showMobileAssignments, setShowMobileAssignments] = useState(false);
 
   // Submission text state for each assignment
   const [submissionTexts, setSubmissionTexts] = useState({});
@@ -238,7 +240,17 @@ export const EnrolledClassDetails = () => {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
-      month: "long",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Format date for mobile/tablet (shorter)
+  const formatDateMobileTablet = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
@@ -260,16 +272,16 @@ export const EnrolledClassDetails = () => {
             type="button"
             onClick={() => !readonly && setRating(star)}
             disabled={readonly}
-            className={`text-2xl transition-colors duration-200 ${
+            className={`text-xl md:text-2xl transition-colors duration-200 ${
               star <= rating
                 ? "text-yellow-400"
                 : "text-gray-300 dark:text-gray-600"
-            } ${!readonly ? "hover:text-yellow-300" : ""}`}
+            } ${!readonly ? "hover:text-yellow-300 p-1" : ""}`}
           >
             <FiStar fill={star <= rating ? "currentColor" : "none"} />
           </button>
         ))}
-        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
+        <span className="ml-2 text-xs md:text-sm text-gray-600 dark:text-gray-400">
           {rating > 0 ? `${rating}/5` : "No rating"}
         </span>
       </div>
@@ -286,11 +298,11 @@ export const EnrolledClassDetails = () => {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8">
+      <div className="p-4 md:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8">
           <div className="flex items-center justify-center space-x-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5D5CDE]"></div>
-            <span className="text-gray-600 dark:text-gray-300">
+            <div className="animate-spin rounded-full h-6 w-6 md:h-8 md:w-8 border-b-2 border-[#5D5CDE]"></div>
+            <span className="text-sm md:text-base text-gray-600 dark:text-gray-300">
               Loading class details...
             </span>
           </div>
@@ -301,17 +313,17 @@ export const EnrolledClassDetails = () => {
 
   if (!classData) {
     return (
-      <div className="p-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-8 text-center">
+      <div className="p-4 md:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 md:p-8 text-center">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             Class not found
           </h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mb-6">
             The class you're looking for doesn't exist or you're not enrolled.
           </p>
           <button
             onClick={() => navigate("/student-dashboard/my-enroll-classes")}
-            className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200"
+            className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium transition-colors duration-200 text-sm md:text-base"
           >
             Back to My Classes
           </button>
@@ -321,29 +333,29 @@ export const EnrolledClassDetails = () => {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="p-4 md:p-6 space-y-6 md:space-y-8">
       {/* Back Button and TER Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <button
           onClick={() => navigate("/student-dashboard/my-enroll-classes")}
-          className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200"
+          className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <FiArrowLeft className="w-5 h-5 mr-2" />
-          Back to My Classes
+          <FiArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+          <span className="text-sm md:text-base">Back to My Classes</span>
         </button>
 
         <button
           onClick={() => setIsTerModalOpen(true)}
-          className="bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white px-6 py-3 rounded-xl font-semibold hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl"
+          className="w-full md:w-auto bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white px-4 md:px-6 py-3 rounded-xl font-semibold hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl text-sm md:text-base"
         >
-          <MdRateReview className="w-5 h-5" />
-          <span>Teaching Evaluation Report</span>
+          <MdRateReview className="w-4 h-4 md:w-5 md:h-5" />
+          <span className="lg:inline">Teaching Evaluation Report</span>
         </button>
       </div>
 
       {/* Class Header */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
-        <div className="relative h-48">
+        <div className="relative h-40 md:h-48 lg:h-56">
           <img
             src={classData.image}
             alt={classData.title}
@@ -352,84 +364,86 @@ export const EnrolledClassDetails = () => {
               e.target.src = "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
             }}
           />
-          <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-              <MdVerified className="w-4 h-4 mr-1" />
+          <div className="absolute top-3 md:top-4 right-3 md:right-4">
+            <span className="inline-flex items-center px-2 md:px-3 py-1 rounded-full text-xs md:text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+              <MdVerified className="w-3 h-3 md:w-4 md:h-4 mr-1" />
               Enrolled
             </span>
           </div>
         </div>
 
-        <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="p-4 md:p-6">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-4">
             {classData.title}
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
-              <FiUser className="w-4 h-4 mr-2" />
-              <span>Instructor: {classData.teacherName}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4 md:mb-6">
+            <div className="flex items-center text-sm md:text-base text-gray-600 dark:text-gray-400">
+              <FiUser className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">
+                Instructor: {classData.teacherName}
+              </span>
             </div>
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
-              <FiMail className="w-4 h-4 mr-2" />
-              <span>{classData.teacherEmail}</span>
+            <div className="flex items-center text-sm md:text-base text-gray-600 dark:text-gray-400">
+              <FiMail className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{classData.teacherEmail}</span>
             </div>
-            <div className="flex items-center text-gray-600 dark:text-gray-400">
-              <FiDollarSign className="w-4 h-4 mr-2" />
+            <div className="flex items-center text-sm md:text-base text-gray-600 dark:text-gray-400 md:col-span-2 lg:col-span-1">
+              <FiDollarSign className="w-4 h-4 mr-2 flex-shrink-0" />
               <span>Price: ${classData.price}</span>
             </div>
           </div>
 
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
             {classData.description}
           </p>
         </div>
       </div>
 
       {/* Class Progress */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-6">
           <div className="flex items-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
-              <FiTarget className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+              <FiTarget className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-400" />
             </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="ml-3 md:ml-4">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {assignments.length}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 Total Assignments
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-6">
           <div className="flex items-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl">
-              <FiCheckCircle className="w-6 h-6 text-green-600 dark:text-green-400" />
+            <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-green-100 dark:bg-green-900/30 rounded-xl">
+              <FiCheckCircle className="w-5 h-5 md:w-6 md:h-6 text-green-600 dark:text-green-400" />
             </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="ml-3 md:ml-4">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {submissions.length}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 Completed
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-4 md:p-6 md:col-span-2 lg:col-span-1">
           <div className="flex items-center">
-            <div className="flex items-center justify-center w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl">
-              <FiClock className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+            <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl">
+              <FiClock className="w-5 h-5 md:w-6 md:h-6 text-orange-600 dark:text-orange-400" />
             </div>
-            <div className="ml-4">
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            <div className="ml-3 md:ml-4">
+              <p className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
                 {assignments.length - submissions.length}
               </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                 Pending
               </p>
             </div>
@@ -439,151 +453,269 @@ export const EnrolledClassDetails = () => {
 
       {/* Assignments Section */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-            Class Assignments
-          </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            Complete your assignments and track your progress
-          </p>
-        </div>
-
-        <div className="overflow-x-auto">
-          {assignments.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <div className="flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl mx-auto mb-4">
-                <FiBook className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                No assignments yet
+        <div className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
+                Class Assignments
               </h3>
-              <p className="text-gray-500 dark:text-gray-400">
-                Your instructor hasn't created any assignments yet. Check back
-                later!
+              <p className="text-xs md:text-sm text-gray-600 dark:text-gray-300 mt-1">
+                Complete your assignments and track your progress
               </p>
             </div>
-          ) : (
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Deadline
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Submission
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {assignments.map((assignment) => {
-                  const isSubmitted = isAssignmentSubmitted(assignment._id);
-                  const isPastDeadline = isDeadlinePassed(assignment.deadline);
-                  const canSubmit = !isSubmitted && !isPastDeadline;
-
-                  return (
-                    <tr
-                      key={assignment._id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {assignment.title}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="text-sm text-gray-600 dark:text-gray-300 max-w-xs">
-                          {assignment.description}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white">
-                          {formatDate(assignment.deadline)}
-                        </div>
-                        {isPastDeadline && !isSubmitted && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            Past deadline
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {isSubmitted ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                            <FiCheckCircle className="w-3 h-3 mr-1" />
-                            Submitted
-                          </span>
-                        ) : isPastDeadline ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                            <FiX className="w-3 h-3 mr-1" />
-                            Missed
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-                            <FiClock className="w-3 h-3 mr-1" />
-                            Pending
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {canSubmit ? (
-                          <div className="space-y-2">
-                            <div className="flex items-center space-x-2">
-                              <textarea
-                                value={submissionTexts[assignment._id] || ""}
-                                onChange={(e) =>
-                                  handleSubmissionTextChange(
-                                    assignment._id,
-                                    e.target.value
-                                  )
-                                }
-                                rows={2}
-                                className="block w-40 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 resize-none"
-                                placeholder="Your submission..."
-                              />
-                              <button
-                                onClick={() =>
-                                  handleAssignmentSubmission(assignment._id)
-                                }
-                                disabled={submissionLoading[assignment._id]}
-                                className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-[#5D5CDE] hover:bg-[#4A4BC9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                              >
-                                {submissionLoading[assignment._id] ? (
-                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                                ) : (
-                                  <FiSend className="w-3 h-3 mr-1" />
-                                )}
-                                Submit
-                              </button>
-                            </div>
-                            {submissionErrors[assignment._id] && (
-                              <p className="text-xs text-red-600 dark:text-red-400">
-                                {submissionErrors[assignment._id]}
-                              </p>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400 dark:text-gray-500 text-xs">
-                            {isSubmitted
-                              ? "Already submitted"
-                              : "Cannot submit"}
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
+          </div>
         </div>
+
+        {assignments.length === 0 ? (
+          <div className="px-4 md:px-6 py-8 md:py-12 text-center">
+            <div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gray-100 dark:bg-gray-700 rounded-2xl mx-auto mb-4">
+              <FiBook className="w-6 h-6 md:w-8 md:h-8 text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No assignments yet
+            </h3>
+            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400">
+              Your instructor hasn't created any assignments yet. Check back
+              later!
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table View (Large screens only) */}
+            <div className="hidden lg:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700/50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Title
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Deadline
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Submission
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {assignments.map((assignment) => {
+                    const isSubmitted = isAssignmentSubmitted(assignment._id);
+                    const isPastDeadline = isDeadlinePassed(
+                      assignment.deadline
+                    );
+                    const canSubmit = !isSubmitted && !isPastDeadline;
+
+                    return (
+                      <tr
+                        key={assignment._id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      >
+                        <td className="px-6 py-4">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {assignment.title}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-600 dark:text-gray-300 max-w-xs">
+                            {assignment.description}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {formatDate(assignment.deadline)}
+                          </div>
+                          {isPastDeadline && !isSubmitted && (
+                            <div className="text-xs text-red-600 dark:text-red-400">
+                              Past deadline
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {isSubmitted ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                              <FiCheckCircle className="w-3 h-3 mr-1" />
+                              Submitted
+                            </span>
+                          ) : isPastDeadline ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              <FiX className="w-3 h-3 mr-1" />
+                              Missed
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                              <FiClock className="w-3 h-3 mr-1" />
+                              Pending
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {canSubmit ? (
+                            <div className="space-y-2">
+                              <div className="flex items-center space-x-2">
+                                <textarea
+                                  value={submissionTexts[assignment._id] || ""}
+                                  onChange={(e) =>
+                                    handleSubmissionTextChange(
+                                      assignment._id,
+                                      e.target.value
+                                    )
+                                  }
+                                  rows={2}
+                                  className="block w-40 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 resize-none"
+                                  placeholder="Your submission..."
+                                />
+                                <button
+                                  onClick={() =>
+                                    handleAssignmentSubmission(assignment._id)
+                                  }
+                                  disabled={submissionLoading[assignment._id]}
+                                  className="inline-flex items-center px-3 py-2 border border-transparent text-xs font-medium rounded-md text-white bg-[#5D5CDE] hover:bg-[#4A4BC9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                >
+                                  {submissionLoading[assignment._id] ? (
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                  ) : (
+                                    <FiSend className="w-3 h-3 mr-1" />
+                                  )}
+                                  Submit
+                                </button>
+                              </div>
+                              {submissionErrors[assignment._id] && (
+                                <p className="text-xs text-red-600 dark:text-red-400">
+                                  {submissionErrors[assignment._id]}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 dark:text-gray-500 text-xs">
+                              {isSubmitted
+                                ? "Already submitted"
+                                : "Cannot submit"}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile/Tablet Card View (Medium screens and below) */}
+            <div className="lg:hidden space-y-4 p-4">
+              {assignments.map((assignment) => {
+                const isSubmitted = isAssignmentSubmitted(assignment._id);
+                const isPastDeadline = isDeadlinePassed(assignment.deadline);
+                const canSubmit = !isSubmitted && !isPastDeadline;
+
+                return (
+                  <div
+                    key={assignment._id}
+                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4 space-y-3"
+                  >
+                    {/* Title and Status */}
+                    <div className="flex items-start justify-between">
+                      <h4 className="font-medium text-gray-900 dark:text-white text-base">
+                        {assignment.title}
+                      </h4>
+                      {isSubmitted ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          <FiCheckCircle className="w-3 h-3 mr-1" />
+                          Submitted
+                        </span>
+                      ) : isPastDeadline ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                          <FiX className="w-3 h-3 mr-1" />
+                          Missed
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          <FiClock className="w-3 h-3 mr-1" />
+                          Pending
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {assignment.description}
+                    </p>
+
+                    {/* Deadline */}
+                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <FiCalendar className="w-4 h-4 mr-2" />
+                      <span>
+                        Due: {formatDateMobileTablet(assignment.deadline)}
+                      </span>
+                      {isPastDeadline && !isSubmitted && (
+                        <span className="ml-2 text-red-600 dark:text-red-400 text-xs">
+                          (Past deadline)
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Submission Area */}
+                    {canSubmit && (
+                      <div className="space-y-2 pt-2">
+                        <textarea
+                          value={submissionTexts[assignment._id] || ""}
+                          onChange={(e) =>
+                            handleSubmissionTextChange(
+                              assignment._id,
+                              e.target.value
+                            )
+                          }
+                          rows={3}
+                          className="block w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 resize-none"
+                          placeholder="Type your submission here..."
+                        />
+                        {submissionErrors[assignment._id] && (
+                          <p className="text-xs text-red-600 dark:text-red-400">
+                            {submissionErrors[assignment._id]}
+                          </p>
+                        )}
+                        <button
+                          onClick={() =>
+                            handleAssignmentSubmission(assignment._id)
+                          }
+                          disabled={submissionLoading[assignment._id]}
+                          className="w-full bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-4 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {submissionLoading[assignment._id] ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <span>Submitting...</span>
+                            </>
+                          ) : (
+                            <>
+                              <FiSend className="w-4 h-4" />
+                              <span>Submit Assignment</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    )}
+
+                    {!canSubmit && (
+                      <div className="text-center py-2">
+                        <span className="text-gray-400 dark:text-gray-500 text-sm">
+                          {isSubmitted
+                            ? "Assignment already submitted"
+                            : "Submission deadline has passed"}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       {/* TER Modal */}
@@ -591,16 +723,16 @@ export const EnrolledClassDetails = () => {
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-3">
-                <div className="flex items-center justify-center w-10 h-10 bg-[#5D5CDE] bg-opacity-10 rounded-xl">
-                  <MdRateReview className="w-5 h-5 text-[#5D5CDE]" />
+                <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-[#5D5CDE] bg-opacity-10 rounded-xl">
+                  <MdRateReview className="w-4 h-4 md:w-5 md:h-5 text-[#5D5CDE]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white">
                     Teaching Evaluation Report
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
                     Share your feedback about this class
                   </p>
                 </div>
@@ -609,14 +741,14 @@ export const EnrolledClassDetails = () => {
                 onClick={() => setIsTerModalOpen(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
               >
-                <FiX className="w-6 h-6" />
+                <FiX className="w-5 h-5 md:w-6 md:h-6" />
               </button>
             </div>
 
             {/* Modal Content */}
             <form
               onSubmit={handleTerSubmit(onTerSubmit)}
-              className="p-6 space-y-6"
+              className="p-4 md:p-6 space-y-4 md:space-y-6"
             >
               {/* Rating */}
               <div>
@@ -632,7 +764,7 @@ export const EnrolledClassDetails = () => {
                   Feedback Description *
                 </label>
                 <textarea
-                  rows={6}
+                  rows={5}
                   {...registerTer("description", {
                     required: "Description is required",
                     minLength: {
@@ -655,28 +787,28 @@ export const EnrolledClassDetails = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4 pt-4 md:pt-6 border-t border-gray-200 dark:border-gray-700">
                 <button
                   type="button"
                   onClick={() => setIsTerModalOpen(false)}
-                  className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 px-6 py-3 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center space-x-2"
+                  className="w-full md:flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 px-4 md:px-6 py-3 rounded-xl font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center space-x-2 text-sm md:text-base"
                 >
-                  <FiX className="w-5 h-5" />
+                  <FiX className="w-4 h-4 md:w-5 md:h-5" />
                   <span>Cancel</span>
                 </button>
                 <button
                   type="submit"
                   disabled={terSubmitting}
-                  className="flex-1 bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full md:flex-1 bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-4 md:px-6 py-3 rounded-xl font-medium transition-colors duration-200 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm md:text-base"
                 >
                   {terSubmitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 md:h-5 md:w-5 border-b-2 border-white"></div>
                       <span>Submitting...</span>
                     </>
                   ) : (
                     <>
-                      <FiSend className="w-5 h-5" />
+                      <FiSend className="w-4 h-4 md:w-5 md:h-5" />
                       <span>Send Evaluation</span>
                     </>
                   )}
