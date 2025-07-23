@@ -12,6 +12,8 @@ import {
   FiFileText,
   FiChevronLeft,
   FiChevronRight,
+  FiCalendar,
+  FiDollarSign,
 } from "react-icons/fi";
 import { MdVerified, MdPending } from "react-icons/md";
 import axios from "axios";
@@ -212,22 +214,22 @@ export const AdminAllClasses = () => {
     switch (status) {
       case "pending":
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-            <MdPending className="w-4 h-4 mr-1" />
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+            <MdPending className="w-3 h-3 mr-1" />
             Pending
           </span>
         );
       case "approved":
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-            <MdVerified className="w-4 h-4 mr-1" />
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+            <MdVerified className="w-3 h-3 mr-1" />
             Approved
           </span>
         );
       case "rejected":
         return (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-            <FiX className="w-4 h-4 mr-1" />
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+            <FiX className="w-3 h-3 mr-1" />
             Rejected
           </span>
         );
@@ -272,8 +274,8 @@ export const AdminAllClasses = () => {
     <>
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 All Classes Management
@@ -284,7 +286,7 @@ export const AdminAllClasses = () => {
             </div>
             <button
               onClick={() => fetchClasses(currentPage, pageSize)}
-              className="mt-3 sm:mt-0 inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
             >
               <FiRefreshCw className="w-4 h-4 mr-2" />
               Refresh
@@ -293,10 +295,10 @@ export const AdminAllClasses = () => {
         </div>
 
         {/* Classes Count */}
-        <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700/50">
-          <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-300">
+        <div className="px-4 sm:px-6 py-3 bg-gray-50 dark:bg-gray-700/50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-sm text-gray-600 dark:text-gray-300">
             <span>Total Classes: {totalClasses}</span>
-            <span>
+            <span className="hidden sm:block">
               Showing {totalClasses > 0 ? (currentPage - 1) * pageSize + 1 : 0}{" "}
               to {Math.min(currentPage * pageSize, totalClasses)} of{" "}
               {totalClasses} classes
@@ -304,10 +306,10 @@ export const AdminAllClasses = () => {
           </div>
         </div>
 
-        {/* Classes Table */}
-        <div className="overflow-x-auto">
+        {/* Classes Content */}
+        <div>
           {classes.length === 0 ? (
-            <div className="px-6 py-12 text-center">
+            <div className="px-4 sm:px-6 py-12 text-center">
               <FiBook className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
               <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                 No classes submitted
@@ -317,133 +319,117 @@ export const AdminAllClasses = () => {
               </p>
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700/50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Class Details
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Teacher
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Description
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {classes.map((classItem) => (
-                  <tr
-                    key={classItem._id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                  >
-                    {/* Class Details */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
+            <>
+              {/* Mobile Card Layout (visible on small screens) */}
+              <div className="block lg:hidden">
+                <div className="space-y-4 p-4">
+                  {classes.map((classItem) => (
+                    <div
+                      key={classItem._id}
+                      className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600"
+                    >
+                      {/* Class Header with Image */}
+                      <div className="flex space-x-3 mb-4">
                         <img
                           src={classItem.image}
                           alt={classItem.title}
-                          className="h-16 w-16 rounded-lg object-cover"
+                          className="h-16 w-16 rounded-lg object-cover flex-shrink-0"
                           onError={(e) => {
                             e.target.src =
                               "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
                           }}
                         />
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white max-w-xs">
-                            {truncateText(classItem.title, 50)}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {classItem.title}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            Created:{" "}
+                          <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <FiCalendar className="w-3 h-3 mr-1" />
                             {new Date(classItem.createdAt).toLocaleDateString()}
                           </div>
+                          <div className="mt-2">
+                            {getStatusBadge(classItem.status)}
+                          </div>
                         </div>
                       </div>
-                    </td>
 
-                    {/* Teacher Info */}
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 dark:text-white">
-                        <div className="flex items-center mb-1">
-                          <FiUser className="w-4 h-4 mr-1 text-gray-400" />
-                          {classItem.teacherName}
+                      {/* Teacher Info */}
+                      <div className="mb-3">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          Teacher:
                         </div>
-                        <div className="flex items-center text-gray-500 dark:text-gray-400">
-                          <FiMail className="w-4 h-4 mr-1" />
-                          {classItem.teacherEmail}
+                        <div className="flex items-center text-xs text-gray-900 dark:text-white space-x-3">
+                          <div className="flex items-center">
+                            <FiUser className="w-3 h-3 mr-1" />
+                            {classItem.teacherName}
+                          </div>
+                          <div className="flex items-center">
+                            <FiMail className="w-3 h-3 mr-1" />
+                            {truncateText(classItem.teacherEmail, 20)}
+                          </div>
                         </div>
                       </div>
-                    </td>
 
-                    {/* Description */}
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 dark:text-white max-w-xs">
-                        {truncateText(classItem.description, 100)}
+                      {/* Description */}
+                      <div className="mb-3">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                          Description:
+                        </div>
+                        <div className="text-xs text-gray-900 dark:text-white">
+                          {truncateText(classItem.description, 80)}
+                        </div>
                       </div>
-                    </td>
 
-                    {/* Status */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(classItem.status)}
-                    </td>
-
-                    {/* Price */}
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
-                        ${classItem.price}
+                      {/* Price */}
+                      <div className="mb-4">
+                        <div className="flex items-center text-sm font-medium text-gray-900 dark:text-white">
+                          <FiDollarSign className="w-4 h-4 mr-1" />$
+                          {classItem.price}
+                        </div>
                       </div>
-                    </td>
 
-                    {/* Actions */}
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        {classItem.status === "pending" ? (
-                          <>
-                            <button
-                              onClick={() =>
-                                handleApprove(classItem._id, classItem.title)
-                              }
-                              disabled={actionLoading[classItem._id]}
-                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                            >
-                              {actionLoading[classItem._id] === "approving" ? (
-                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                              ) : (
-                                <FiCheck className="w-3 h-3 mr-1" />
-                              )}
-                              Approve
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleReject(classItem._id, classItem.title)
-                              }
-                              disabled={actionLoading[classItem._id]}
-                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                            >
-                              {actionLoading[classItem._id] === "rejecting" ? (
-                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
-                              ) : (
-                                <FiX className="w-3 h-3 mr-1" />
-                              )}
-                              Reject
-                            </button>
-                          </>
-                        ) : (
-                          <span className="text-gray-400 dark:text-gray-500 text-xs">
-                            {classItem.status === "approved"
-                              ? "Approved"
-                              : "Rejected"}
-                          </span>
-                        )}
+                      {/* Actions */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          {classItem.status === "pending" ? (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleApprove(classItem._id, classItem.title)
+                                }
+                                disabled={actionLoading[classItem._id]}
+                                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                              >
+                                {actionLoading[classItem._id] ===
+                                "approving" ? (
+                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                ) : (
+                                  <FiCheck className="w-3 h-3" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleReject(classItem._id, classItem.title)
+                                }
+                                disabled={actionLoading[classItem._id]}
+                                className="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                              >
+                                {actionLoading[classItem._id] ===
+                                "rejecting" ? (
+                                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                ) : (
+                                  <FiX className="w-3 h-3" />
+                                )}
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-gray-400 dark:text-gray-500 text-xs">
+                              {classItem.status === "approved"
+                                ? "Approved"
+                                : "Rejected"}
+                            </span>
+                          )}
+                        </div>
 
                         {/* Progress Button */}
                         <button
@@ -461,21 +447,184 @@ export const AdminAllClasses = () => {
                           Progress
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Desktop Table Layout (hidden on small screens) */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Class Details
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Teacher
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Price
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {classes.map((classItem) => (
+                      <tr
+                        key={classItem._id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      >
+                        {/* Class Details */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <img
+                              src={classItem.image}
+                              alt={classItem.title}
+                              className="h-16 w-16 rounded-lg object-cover"
+                              onError={(e) => {
+                                e.target.src =
+                                  "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
+                              }}
+                            />
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-gray-900 dark:text-white max-w-xs">
+                                {truncateText(classItem.title, 50)}
+                              </div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                Created:{" "}
+                                {new Date(
+                                  classItem.createdAt
+                                ).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Teacher Info */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            <div className="flex items-center mb-1">
+                              <FiUser className="w-4 h-4 mr-1 text-gray-400" />
+                              {classItem.teacherName}
+                            </div>
+                            <div className="flex items-center text-gray-500 dark:text-gray-400">
+                              <FiMail className="w-4 h-4 mr-1" />
+                              {classItem.teacherEmail}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Description */}
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-900 dark:text-white max-w-xs">
+                            {truncateText(classItem.description, 100)}
+                          </div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(classItem.status)}
+                        </td>
+
+                        {/* Price */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            ${classItem.price}
+                          </div>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end space-x-2">
+                            {classItem.status === "pending" ? (
+                              <>
+                                <button
+                                  onClick={() =>
+                                    handleApprove(
+                                      classItem._id,
+                                      classItem.title
+                                    )
+                                  }
+                                  disabled={actionLoading[classItem._id]}
+                                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                >
+                                  {actionLoading[classItem._id] ===
+                                  "approving" ? (
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                  ) : (
+                                    <FiCheck className="w-3 h-3 mr-1" />
+                                  )}
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    handleReject(classItem._id, classItem.title)
+                                  }
+                                  disabled={actionLoading[classItem._id]}
+                                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                                >
+                                  {actionLoading[classItem._id] ===
+                                  "rejecting" ? (
+                                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                  ) : (
+                                    <FiX className="w-3 h-3 mr-1" />
+                                  )}
+                                  Reject
+                                </button>
+                              </>
+                            ) : (
+                              <span className="text-gray-400 dark:text-gray-500 text-xs">
+                                {classItem.status === "approved"
+                                  ? "Approved"
+                                  : "Rejected"}
+                              </span>
+                            )}
+
+                            {/* Progress Button */}
+                            <button
+                              onClick={() =>
+                                handleViewProgress(
+                                  classItem._id,
+                                  classItem.title
+                                )
+                              }
+                              disabled={classItem.status !== "approved"}
+                              className={`inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md transition-colors duration-200 ${
+                                classItem.status === "approved"
+                                  ? "text-white bg-[#5D5CDE] hover:bg-[#4A4BC9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE]"
+                                  : "text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-gray-700 cursor-not-allowed"
+                              }`}
+                            >
+                              <FiActivity className="w-3 h-3 mr-1" />
+                              Progress
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </div>
 
-        {/* Pagination */}
-        <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+        {/* Responsive Pagination */}
+        <div className="bg-gray-50 dark:bg-gray-700/50 px-4 sm:px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
             {/* Left Side: Pagination Info and Page Size Selector */}
-            <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
               {/* Pagination Info */}
-              <div className="text-sm text-gray-600 dark:text-gray-300">
+              <div className="text-sm text-gray-600 dark:text-gray-300 text-center sm:text-left">
                 Showing{" "}
                 {totalClasses > 0 ? (currentPage - 1) * pageSize + 1 : 0} to{" "}
                 {Math.min(currentPage * pageSize, totalClasses)} of{" "}
@@ -483,7 +632,7 @@ export const AdminAllClasses = () => {
               </div>
 
               {/* Page Size Selector */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-center sm:justify-start space-x-2">
                 <span className="text-sm text-gray-600 dark:text-gray-300">
                   Show:
                 </span>
@@ -502,7 +651,7 @@ export const AdminAllClasses = () => {
 
             {/* Right Side: Pagination Controls */}
             {totalPages > 1 ? (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-center space-x-2">
                 {/* Previous Button */}
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
@@ -510,11 +659,11 @@ export const AdminAllClasses = () => {
                   className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                 >
                   <FiChevronLeft className="w-4 h-4 mr-1" />
-                  Previous
+                  <span className="hidden sm:inline">Previous</span>
                 </button>
 
-                {/* Page Numbers */}
-                <div className="flex items-center space-x-1">
+                {/* Page Numbers - Hide on very small screens */}
+                <div className="hidden sm:flex items-center space-x-1">
                   {getPageNumbers().map((pageNum) => (
                     <button
                       key={pageNum}
@@ -530,18 +679,23 @@ export const AdminAllClasses = () => {
                   ))}
                 </div>
 
+                {/* Current page indicator for small screens */}
+                <div className="sm:hidden px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {currentPage} / {totalPages}
+                </div>
+
                 {/* Next Button */}
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
                   <FiChevronRight className="w-4 h-4 ml-1" />
                 </button>
               </div>
             ) : (
-              <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-sm text-gray-500 dark:text-gray-400 text-center lg:text-right">
                 {totalClasses <= pageSize
                   ? "All classes displayed"
                   : "Page 1 of 1"}
@@ -551,21 +705,21 @@ export const AdminAllClasses = () => {
         </div>
       </div>
 
-      {/* Progress Modal */}
+      {/* Responsive Progress Modal */}
       {isProgressModalOpen && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center space-x-3">
                 <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
                   <FiActivity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                     Class Progress
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs sm:max-w-none">
                     {selectedClassProgress?.className || "Loading..."}
                   </p>
                 </div>
@@ -579,7 +733,7 @@ export const AdminAllClasses = () => {
             </div>
 
             {/* Modal Content */}
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {progressLoading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -590,18 +744,18 @@ export const AdminAllClasses = () => {
               ) : (
                 <div className="space-y-6">
                   {/* Progress Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                     {/* Total Enrollment Card */}
-                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-4 sm:p-6 border border-blue-200 dark:border-blue-800">
                       <div className="flex items-center">
-                        <div className="flex items-center justify-center w-12 h-12 bg-blue-500 rounded-xl">
-                          <FiUsers className="w-6 h-6 text-white" />
+                        <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-xl">
+                          <FiUsers className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
-                        <div className="ml-4">
-                          <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-2xl sm:text-3xl font-bold text-blue-600 dark:text-blue-400">
                             {selectedClassProgress?.enrollmentCount || 0}
                           </p>
-                          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                          <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium">
                             Total Enrollment
                           </p>
                         </div>
@@ -609,16 +763,16 @@ export const AdminAllClasses = () => {
                     </div>
 
                     {/* Total Assignments Card */}
-                    <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-6 border border-green-200 dark:border-green-800">
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-4 sm:p-6 border border-green-200 dark:border-green-800">
                       <div className="flex items-center">
-                        <div className="flex items-center justify-center w-12 h-12 bg-green-500 rounded-xl">
-                          <FiBook className="w-6 h-6 text-white" />
+                        <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-green-500 rounded-xl">
+                          <FiBook className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
-                        <div className="ml-4">
-                          <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-2xl sm:text-3xl font-bold text-green-600 dark:text-green-400">
                             {selectedClassProgress?.assignmentCount || 0}
                           </p>
-                          <p className="text-sm text-green-600 dark:text-green-400 font-medium">
+                          <p className="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium">
                             Total Assignments
                           </p>
                         </div>
@@ -626,16 +780,16 @@ export const AdminAllClasses = () => {
                     </div>
 
                     {/* Total Submissions Card */}
-                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-6 border border-purple-200 dark:border-purple-800">
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-4 sm:p-6 border border-purple-200 dark:border-purple-800">
                       <div className="flex items-center">
-                        <div className="flex items-center justify-center w-12 h-12 bg-purple-500 rounded-xl">
-                          <FiFileText className="w-6 h-6 text-white" />
+                        <div className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 bg-purple-500 rounded-xl">
+                          <FiFileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
-                        <div className="ml-4">
-                          <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                        <div className="ml-3 sm:ml-4">
+                          <p className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">
                             {selectedClassProgress?.submissionCount || 0}
                           </p>
-                          <p className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                          <p className="text-xs sm:text-sm text-purple-600 dark:text-purple-400 font-medium">
                             Assignment Submissions
                           </p>
                         </div>
@@ -645,44 +799,44 @@ export const AdminAllClasses = () => {
 
                   {/* Additional Progress Info */}
                   {selectedClassProgress?.classData && (
-                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6">
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 sm:p-6">
                       <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                         Progress Overview
                       </h4>
                       <div className="space-y-3">
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                          <span className="text-gray-600 dark:text-gray-400 text-sm">
                             Class Status:
                           </span>
-                          <span>
+                          <span className="mt-1 sm:mt-0">
                             {getStatusBadge(
                               selectedClassProgress.classData.status
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                          <span className="text-gray-600 dark:text-gray-400 text-sm">
                             Teacher:
                           </span>
-                          <span className="text-gray-900 dark:text-white font-medium">
+                          <span className="text-gray-900 dark:text-white font-medium text-sm mt-1 sm:mt-0">
                             {selectedClassProgress.classData.teacherName}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                          <span className="text-gray-600 dark:text-gray-400 text-sm">
                             Created:
                           </span>
-                          <span className="text-gray-900 dark:text-white">
+                          <span className="text-gray-900 dark:text-white text-sm mt-1 sm:mt-0">
                             {formatDate(
                               selectedClassProgress.classData.createdAt
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                          <span className="text-gray-600 dark:text-gray-400 text-sm">
                             Price:
                           </span>
-                          <span className="text-gray-900 dark:text-white font-medium">
+                          <span className="text-gray-900 dark:text-white font-medium text-sm mt-1 sm:mt-0">
                             ${selectedClassProgress.classData.price}
                           </span>
                         </div>
