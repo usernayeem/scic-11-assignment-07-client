@@ -25,6 +25,7 @@ import { Payment } from "../pages/CheckoutForm";
 import { EnrolledClassDetails } from "../pages/EnrolledClassDetails";
 import { ClassDetailsTeacher } from "../pages/ClassDetailsTeacher";
 import { ForgotPassword } from "../pages/ForgotPassword";
+import { MyRequest } from "../pages/MyRequest";
 
 export const router = createBrowserRouter([
   {
@@ -102,6 +103,10 @@ export const router = createBrowserRouter([
           {
             path: "profile",
             element: <Profile />,
+          },
+          {
+            path: "my-request",
+            element: <MyRequest />,
           },
         ],
       },

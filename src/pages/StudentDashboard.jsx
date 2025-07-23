@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { FiBook, FiUser, FiLogOut, FiHome } from "react-icons/fi";
+import { FiBook, FiUser, FiLogOut, FiHome, FiFileText } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
@@ -26,6 +26,11 @@ export const StudentDashboard = () => {
       name: "My Enrolled Classes",
       path: "/student-dashboard/my-enroll-classes",
       icon: FiBook,
+    },
+    {
+      name: "My Request",
+      path: "/student-dashboard/my-request",
+      icon: FiFileText,
     },
     {
       name: "Profile",
