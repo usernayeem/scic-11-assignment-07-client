@@ -148,12 +148,12 @@ export const Navbar = () => {
             </Link>
 
             <div className="hidden md:flex items-center space-x-6">
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
               >
                 Home
-              </a>
+              </Link>
               <Link
                 to="/all-classes"
                 href="#"
@@ -259,20 +259,20 @@ export const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Home
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                to="/all-classes"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 All Classes
-              </a>
+              </Link>
               <Link
                 to="/teach"
                 className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
@@ -289,30 +289,6 @@ export const Navbar = () => {
                 >
                   Login In
                 </Link>
-              )}
-
-              {user && (
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                  <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                    Signed in as: {getDisplayName()}
-                  </div>
-                  <button
-                    onClick={handleMobileDashboardClick}
-                    disabled={isDashboardLoading}
-                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    {isDashboardLoading ? "Loading Dashboard..." : "Dashboard"}
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                  >
-                    Logout
-                  </button>
-                </div>
               )}
             </div>
           </div>
