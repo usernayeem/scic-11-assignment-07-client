@@ -11,6 +11,8 @@ import {
   FiClock,
   FiXCircle,
   FiRefreshCw,
+  FiEdit3,
+  FiArrowLeft,
 } from "react-icons/fi";
 import { MdOutlineSchool, MdVerified } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -29,6 +31,7 @@ export const TeachOnEduManage = () => {
   const [loading, setLoading] = useState(true);
   const [isResubmitting, setIsResubmitting] = useState(false);
   const [applicationData, setApplicationData] = useState(null);
+  const [showEditForm, setShowEditForm] = useState(false);
 
   // React Hook Form setup
   const {
@@ -36,6 +39,7 @@ export const TeachOnEduManage = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm({
     defaultValues: {
       name: user?.displayName || "",
@@ -144,27 +148,41 @@ export const TeachOnEduManage = () => {
     }
   };
 
-  // Handle resubmission after rejection
-  const handleResubmit = async () => {
-    setIsResubmitting(true);
+  // Function to update existing teacher application
+  const updateTeacherApplication = async (applicationId, updateData) => {
     try {
-      // Update the existing application status back to pending
-      await axios.patch(
-        `${import.meta.env.VITE_API}/teacher-applications/${
-          applicationData._id
-        }`,
-        { status: "pending" }
+      const response = await axios.put(
+        `${import.meta.env.VITE_API}/teacher-applications/${applicationId}`,
+        updateData
       );
-
-      setApplicationStatus("pending");
-      toast.success(
-        "Application resubmitted successfully! We will review it again."
-      );
+      return response.data;
     } catch (error) {
-      toast.error("Failed to resubmit application. Please try again.");
-    } finally {
-      setIsResubmitting(false);
+      throw error;
     }
+  };
+
+  // Handle showing edit form for resubmission
+  const handleStartEdit = () => {
+    if (applicationData) {
+      // Pre-fill form with existing data
+      setValue("title", applicationData.title);
+      setValue("experience", applicationData.experience);
+      setValue("category", applicationData.category);
+      setShowEditForm(true);
+    }
+  };
+
+  // Handle canceling edit
+  const handleCancelEdit = () => {
+    setShowEditForm(false);
+    // Reset form to original values
+    reset({
+      name: user?.displayName || "",
+      email: user?.email || "",
+      title: "",
+      experience: "",
+      category: "",
+    });
   };
 
   // Form submission handler
@@ -172,19 +190,51 @@ export const TeachOnEduManage = () => {
     setIsSubmitting(true);
 
     try {
-      const applicationPayload = {
-        uid: user.uid,
-        name: data.name,
-        email: user.email,
-        photoURL: user.photoURL || "",
-        title: data.title,
-        experience: data.experience,
-        category: data.category,
-        status: "pending",
-        appliedAt: new Date(),
-      };
+      if (showEditForm && applicationData) {
+        // Update existing application
+        const updateData = {
+          title: data.title,
+          experience: data.experience,
+          category: data.category,
+        };
 
-      await submitTeacherApplication(applicationPayload);
+        await updateTeacherApplication(applicationData._id, updateData);
+
+        // Update local state
+        setApplicationStatus("pending");
+        setApplicationData({
+          ...applicationData,
+          ...updateData,
+          status: "pending",
+        });
+        setShowEditForm(false);
+
+        toast.success(
+          "Application updated and resubmitted successfully! We will review your updated application."
+        );
+      } else {
+        // Create new application
+        const applicationPayload = {
+          uid: user.uid,
+          name: data.name,
+          email: user.email,
+          photoURL: user.photoURL || "",
+          title: data.title,
+          experience: data.experience,
+          category: data.category,
+          status: "pending",
+          appliedAt: new Date(),
+        };
+
+        await submitTeacherApplication(applicationPayload);
+
+        // Update local state to show pending status
+        setApplicationStatus("pending");
+
+        toast.success(
+          "Application submitted successfully! We will review your application and get back to you soon."
+        );
+      }
 
       // Reset form
       reset({
@@ -194,13 +244,6 @@ export const TeachOnEduManage = () => {
         experience: "",
         category: "",
       });
-
-      // Update local state to show pending status
-      setApplicationStatus("pending");
-
-      toast.success(
-        "Application submitted successfully! We will review your application and get back to you soon."
-      );
     } catch (error) {
       if (error.response?.status === 409) {
         toast.error("You have already submitted a teaching application.");
@@ -290,7 +333,7 @@ export const TeachOnEduManage = () => {
   }
 
   // Show pending status
-  if (applicationStatus === "pending") {
+  if (applicationStatus === "pending" && !showEditForm) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
@@ -375,8 +418,8 @@ export const TeachOnEduManage = () => {
     );
   }
 
-  // Show rejected status with resubmit option
-  if (applicationStatus === "rejected") {
+  // Show rejected status with edit option
+  if (applicationStatus === "rejected" && !showEditForm) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto">
@@ -389,7 +432,8 @@ export const TeachOnEduManage = () => {
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
               Unfortunately, your teaching application was not approved at this
-              time. But don't worry - you can submit a new application!
+              time. You can edit and resubmit your application with updated
+              information.
             </p>
           </div>
 
@@ -404,31 +448,20 @@ export const TeachOnEduManage = () => {
               Application Status: Rejected
             </h3>
             <p className="text-gray-600 dark:text-gray-300 mb-8">
-              We appreciate your interest in teaching with us. While your
-              current application wasn't approved, we encourage you to review
-              our guidelines and submit a new application when you're ready.
+              We appreciate your interest in teaching with us. You can now edit
+              your application information and submit it again for review.
             </p>
 
             <button
-              onClick={handleResubmit}
-              disabled={isResubmitting}
-              className="bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-8 rounded-xl font-semibold text-lg hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center justify-center space-x-3 mx-auto shadow-lg hover:shadow-xl hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed"
+              onClick={handleStartEdit}
+              className="bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-3 px-8 rounded-xl font-semibold text-lg hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center justify-center space-x-3 mx-auto shadow-lg hover:shadow-xl hover:-translate-y-1"
             >
-              {isResubmitting ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Processing...</span>
-                </>
-              ) : (
-                <>
-                  <FiRefreshCw className="w-5 h-5" />
-                  <span>Submit New Application</span>
-                </>
-              )}
+              <FiEdit3 className="w-5 h-5" />
+              <span>Edit & Resubmit Application</span>
             </button>
 
             <p className="text-gray-500 dark:text-gray-400 mt-4 text-sm">
-              This will allow you to submit a new teaching application
+              Update your course information and resubmit for review
             </p>
           </div>
         </div>
@@ -436,7 +469,15 @@ export const TeachOnEduManage = () => {
     );
   }
 
-  // Show application form (default state)
+  // Show application form (default state or edit mode)
+  const isEditMode = showEditForm && applicationData;
+  const formTitle = isEditMode
+    ? "Edit Teaching Application"
+    : "Become an Instructor";
+  const formDescription = isEditMode
+    ? "Update your teaching application information and resubmit for review."
+    : "Join our community of educators and share your expertise with students worldwide. Apply to teach on EduManage today.";
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto">
@@ -446,22 +487,33 @@ export const TeachOnEduManage = () => {
             <MdOutlineSchool className="text-white text-2xl" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Become an Instructor
+            {formTitle}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto">
-            Join our community of educators and share your expertise with
-            students worldwide. Apply to teach on EduManage today.
+            {formDescription}
           </p>
+
+          {isEditMode && (
+            <button
+              onClick={handleCancelEdit}
+              className="mt-4 inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200"
+            >
+              <FiArrowLeft className="w-4 h-4 mr-1" />
+              Back to Application Status
+            </button>
+          )}
         </div>
 
         {/* Application Form */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-8 py-6 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              Teaching Application
+              {isEditMode ? "Update Application" : "Teaching Application"}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              Please fill out the form below to apply for a teaching position.
+              {isEditMode
+                ? "Make changes to your application information below."
+                : "Please fill out the form below to apply for a teaching position."}
             </p>
           </div>
 
@@ -644,26 +696,47 @@ export const TeachOnEduManage = () => {
 
             {/* Submit Button */}
             <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl group"
-              >
-                {isSubmitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
-                    <span>Submitting Application...</span>
-                  </>
-                ) : (
-                  <>
-                    <FiCheckCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-                    <span>Submit for Review</span>
-                    <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
-                  </>
+              <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+                {isEditMode && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="w-full sm:w-auto px-6 py-4 border border-gray-300 dark:border-gray-600 rounded-xl font-semibold text-lg text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
                 )}
-              </button>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white py-4 px-6 rounded-xl font-semibold text-lg hover:from-[#4A4BC9] hover:to-[#3A3AB9] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5D5CDE] transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg hover:shadow-xl group"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                      <span>
+                        {isEditMode
+                          ? "Updating Application..."
+                          : "Submitting Application..."}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <FiCheckCircle className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
+                      <span>
+                        {isEditMode ? "Update & Resubmit" : "Submit for Review"}
+                      </span>
+                      <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                    </>
+                  )}
+                </button>
+              </div>
+
               <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-3">
-                Your application will be reviewed within 2-3 business days
+                {isEditMode
+                  ? "Your updated application will be reviewed within 2-3 business days"
+                  : "Your application will be reviewed within 2-3 business days"}
               </p>
             </div>
           </form>
