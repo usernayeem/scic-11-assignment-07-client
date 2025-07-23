@@ -77,7 +77,6 @@ export const EnrolledClassDetails = () => {
         navigate("/student-dashboard/my-enroll-classes");
       }
     } catch (error) {
-      console.error("Error fetching class details:", error);
       toast.error("Failed to load class details");
       navigate("/student-dashboard/my-enroll-classes");
     } finally {
@@ -95,7 +94,7 @@ export const EnrolledClassDetails = () => {
         setAssignments(response.data.assignments);
       }
     } catch (error) {
-      console.error("Error fetching assignments:", error);
+      toast.error("Error fetching assignments:");
     }
   };
 
@@ -111,7 +110,7 @@ export const EnrolledClassDetails = () => {
         setSubmissions(response.data.submissions);
       }
     } catch (error) {
-      console.error("Error fetching submissions:", error);
+      toast.error("Error fetching submissions:");
     }
   };
 
@@ -176,7 +175,6 @@ export const EnrolledClassDetails = () => {
         toast.error("Failed to submit assignment");
       }
     } catch (error) {
-      console.error("Error submitting assignment:", error);
       if (error.response?.status === 409) {
         toast.error("You have already submitted this assignment");
       } else {
@@ -221,7 +219,6 @@ export const EnrolledClassDetails = () => {
         toast.error("Failed to submit evaluation");
       }
     } catch (error) {
-      console.error("Error submitting TER:", error);
       if (error.response?.status === 409) {
         toast.error("You have already submitted an evaluation for this class");
       } else {

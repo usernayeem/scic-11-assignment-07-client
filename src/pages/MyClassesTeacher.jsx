@@ -81,7 +81,6 @@ export const MyClassesTeacher = () => {
         toast.error("Failed to fetch classes");
       }
     } catch (error) {
-      console.error("Error fetching classes:", error);
       toast.error("Failed to load classes");
     } finally {
       setLoading(false);
@@ -196,7 +195,6 @@ export const MyClassesTeacher = () => {
         throw new Error("Failed to upload image");
       }
     } catch (error) {
-      console.error("Error uploading image:", error);
       throw new Error("Failed to upload image to imgbb");
     } finally {
       setIsUploadingImage(false);
@@ -259,7 +257,6 @@ export const MyClassesTeacher = () => {
         toast.error("Failed to update class");
       }
     } catch (error) {
-      console.error("Error updating class:", error);
       if (error.message.includes("imgbb")) {
         toast.error("Failed to upload image. Please try again.");
       } else {
@@ -315,7 +312,6 @@ export const MyClassesTeacher = () => {
           toast.error("Failed to delete class");
         }
       } catch (error) {
-        console.error("Error deleting class:", error);
         toast.error("Failed to delete class");
       }
     }

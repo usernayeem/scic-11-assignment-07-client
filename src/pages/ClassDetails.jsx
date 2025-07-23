@@ -50,7 +50,6 @@ export const ClassDetails = () => {
         navigate("/all-classes");
       }
     } catch (error) {
-      console.error("Error fetching class details:", error);
       toast.error("Failed to load class details");
       navigate("/all-classes");
     } finally {

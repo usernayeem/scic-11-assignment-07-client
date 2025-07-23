@@ -53,7 +53,6 @@ export const AdminAllClasses = () => {
         toast.error("Failed to fetch classes");
       }
     } catch (error) {
-      console.error("Error fetching classes:", error);
       toast.error("Failed to load classes");
     } finally {
       setLoading(false);
@@ -115,7 +114,6 @@ export const AdminAllClasses = () => {
           : [],
       };
     } catch (error) {
-      console.error("Error fetching progress data:", error);
       throw error;
     }
   };
@@ -136,7 +134,6 @@ export const AdminAllClasses = () => {
         toast.success(`Class "${className}" approved successfully!`);
       }
     } catch (error) {
-      console.error("Error approving class:", error);
       toast.error("Failed to approve class. Please try again.");
     } finally {
       setActionLoading((prev) => ({ ...prev, [classId]: null }));
@@ -159,7 +156,6 @@ export const AdminAllClasses = () => {
         toast.success(`Class "${className}" rejected`);
       }
     } catch (error) {
-      console.error("Error rejecting class:", error);
       toast.error("Failed to reject class. Please try again.");
     } finally {
       setActionLoading((prev) => ({ ...prev, [classId]: null }));
@@ -194,7 +190,6 @@ export const AdminAllClasses = () => {
         submissionCount,
       });
     } catch (error) {
-      console.error("Error fetching progress data:", error);
       toast.error("Failed to load progress data");
       setIsProgressModalOpen(false);
     } finally {

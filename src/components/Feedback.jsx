@@ -44,7 +44,6 @@ export const Feedback = () => {
         toast.error("Failed to fetch feedback");
       }
     } catch (error) {
-      console.error("Error fetching feedback:", error);
       toast.error("Failed to load feedback");
     } finally {
       setLoading(false);

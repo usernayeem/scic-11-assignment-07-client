@@ -56,7 +56,6 @@ export const Users = () => {
         toast.error("Failed to fetch users");
       }
     } catch (error) {
-      console.error("Error fetching users:", error);
       toast.error("Failed to load users");
     } finally {
       setLoading(false);
@@ -140,7 +139,6 @@ export const Users = () => {
         toast.success(`${userName} has been made an admin successfully!`);
       }
     } catch (error) {
-      console.error("Error making user admin:", error);
       toast.error("Failed to make user admin. Please try again.");
     } finally {
       setActionLoading((prev) => ({ ...prev, [uid]: false }));

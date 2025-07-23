@@ -129,7 +129,6 @@ export const AddClass = () => {
         throw new Error("Failed to upload image");
       }
     } catch (error) {
-      console.error("Error uploading image:", error);
       throw new Error("Failed to upload image to imgbb");
     } finally {
       setIsUploadingImage(false);
@@ -180,7 +179,6 @@ export const AddClass = () => {
         toast.error(response.data.message || "Failed to add class");
       }
     } catch (error) {
-      console.error("Error adding class:", error);
       if (error.message.includes("imgbb")) {
         toast.error("Failed to upload image. Please try again.");
       } else if (error.response?.data?.message) {

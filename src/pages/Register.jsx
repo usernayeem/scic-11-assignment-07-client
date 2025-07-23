@@ -63,7 +63,6 @@ export const Register = () => {
       });
       return response.data;
     } catch (error) {
-      console.error("Error saving user to database:", error);
       throw error;
     }
   };

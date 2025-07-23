@@ -45,7 +45,6 @@ export const TeacherRequest = () => {
         toast.error("Failed to fetch teacher applications");
       }
     } catch (error) {
-      console.error("Error fetching applications:", error);
       toast.error("Failed to load teacher applications");
     } finally {
       setLoading(false);
@@ -110,7 +109,6 @@ export const TeacherRequest = () => {
         toast.success("Teacher application approved successfully!");
       }
     } catch (error) {
-      console.error("Error approving application:", error);
       toast.error("Failed to approve application. Please try again.");
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: null }));
@@ -134,7 +132,6 @@ export const TeacherRequest = () => {
         toast.success("Teacher application rejected");
       }
     } catch (error) {
-      console.error("Error rejecting application:", error);
       toast.error("Failed to reject application. Please try again.");
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: null }));

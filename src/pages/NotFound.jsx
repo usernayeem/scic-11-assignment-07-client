@@ -1,11 +1,11 @@
 import React from "react";
-import { 
-  FiHome, 
-  FiArrowLeft, 
-  FiSearch, 
+import {
+  FiHome,
+  FiArrowLeft,
+  FiSearch,
   FiBookOpen,
   FiUsers,
-  FiAward
+  FiAward,
 } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,7 +30,6 @@ export const NotFound = () => {
       <div className="max-w-4xl mx-auto text-center relative z-10">
         {/* 404 Error Section */}
         <div className="mb-12">
-
           {/* Large 404 */}
           <div className="mb-8">
             <h1 className="text-8xl md:text-9xl lg:text-[12rem] font-bold text-[#5D5CDE] opacity-20 leading-none">
@@ -41,8 +40,9 @@ export const NotFound = () => {
                 Oops! Page Not Found
               </h2>
               <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Looks like you've ventured into uncharted educational territory. 
-                The page you're looking for seems to have graduated and moved on!
+                Looks like you've ventured into uncharted educational territory.
+                The page you're looking for seems to have graduated and moved
+                on!
               </p>
             </div>
           </div>
@@ -56,7 +56,7 @@ export const NotFound = () => {
               <FiArrowLeft className="w-5 h-5" />
               <span>Go Back</span>
             </button>
-            
+
             <Link
               to="/"
               className="bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white px-8 py-3 rounded-xl font-semibold text-base hover:from-[#4A4BC9] hover:to-[#3A3AB9] transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl min-w-[200px] justify-center group"

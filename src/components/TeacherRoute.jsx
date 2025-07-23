@@ -33,7 +33,6 @@ export const TeacherRoute = ({ children }) => {
           toast.error("Unable to verify user permissions");
         }
       } catch (error) {
-        console.error("Error fetching user role:", error);
         setRoleError(true);
         toast.error("Failed to verify user permissions");
       } finally {

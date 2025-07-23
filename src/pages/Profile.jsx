@@ -58,7 +58,6 @@ export const Profile = () => {
         );
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
       setUserRole("student"); // Default fallback
       setUserFromDB(null);
     } finally {
@@ -96,7 +95,7 @@ export const Profile = () => {
           photoURL: data.photoURL,
         });
       } catch (backendError) {
-        console.log(
+        toast.info(
           "Backend update not available, continuing with Firebase update"
         );
       }

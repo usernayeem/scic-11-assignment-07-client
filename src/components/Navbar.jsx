@@ -32,7 +32,6 @@ export const Navbar = () => {
         setUserFromDB(response.data.user);
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
       setUserFromDB(null);
     }
   };
@@ -107,7 +106,6 @@ export const Navbar = () => {
         navigate("/");
       }
     } catch (error) {
-      console.error("Error fetching user role:", error);
       toast.error("Failed to access dashboard. Please try again.");
       navigate("/");
     } finally {

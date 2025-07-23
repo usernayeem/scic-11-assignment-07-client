@@ -132,7 +132,6 @@ const CheckoutForm = ({ classData, amount, onSuccess }) => {
             navigate("/student-dashboard/my-enroll-classes");
           }, 2000);
         } catch (enrollmentError) {
-          console.error("Enrollment error:", enrollmentError);
           setError(
             "Payment succeeded but enrollment failed. Please contact support."
           );

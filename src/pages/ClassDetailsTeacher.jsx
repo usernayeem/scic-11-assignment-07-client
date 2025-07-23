@@ -63,7 +63,6 @@ export const ClassDetailsTeacher = () => {
         navigate("/teacher-dashboard/my-classes");
       }
     } catch (error) {
-      console.error("Error fetching class details:", error);
       toast.error("Failed to load class details");
       navigate("/teacher-dashboard/my-classes");
     } finally {
@@ -81,7 +80,7 @@ export const ClassDetailsTeacher = () => {
         setAssignments(response.data.assignments);
       }
     } catch (error) {
-      console.error("Error fetching assignments:", error);
+      toast.error("Error fetching assignments:");
     }
   };
 
@@ -95,7 +94,7 @@ export const ClassDetailsTeacher = () => {
         setSubmissions(response.data.submissions);
       }
     } catch (error) {
-      console.error("Error fetching submissions:", error);
+      toast.error("Error fetching submissions:");
     }
   };
 
@@ -126,7 +125,6 @@ export const ClassDetailsTeacher = () => {
         toast.error("Failed to create assignment");
       }
     } catch (error) {
-      console.error("Error creating assignment:", error);
       toast.error("Failed to create assignment. Please try again.");
     } finally {
       setIsCreatingAssignment(false);
@@ -361,9 +359,7 @@ export const ClassDetailsTeacher = () => {
                     </p>
                     <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                       <FiCalendar className="w-4 h-4 mr-1" />
-                      <span>
-                        Due: {formatDate(assignment.deadline)}
-                      </span>
+                      <span>Due: {formatDate(assignment.deadline)}</span>
                     </div>
                   </div>
                   <div className="ml-4 text-right">

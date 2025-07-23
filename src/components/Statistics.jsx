@@ -39,7 +39,6 @@ export const Statistics = () => {
         toast.error("Failed to load statistics");
       }
     } catch (error) {
-      console.error("Error fetching statistics:", error);
       toast.error("Failed to load statistics");
     } finally {
       setLoading(false);

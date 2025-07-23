@@ -57,7 +57,6 @@ export const MyEnrolledClasses = () => {
         toast.error("Failed to fetch enrolled classes");
       }
     } catch (error) {
-      console.error("Error fetching enrolled classes:", error);
       toast.error("Failed to load enrolled classes");
     } finally {
       setLoading(false);
@@ -146,7 +145,6 @@ export const MyEnrolledClasses = () => {
             hasAssignments: totalAssignments > 0,
           };
         } catch (error) {
-          console.error(`Error fetching progress for class ${classId}:`, error);
           // Set default progress data on error
           progressData[classId] = {
             totalAssignments: 0,
@@ -161,7 +159,7 @@ export const MyEnrolledClasses = () => {
       await Promise.all(progressPromises);
       setClassProgress(progressData);
     } catch (error) {
-      console.error("Error fetching class progress:", error);
+      toast.error("Error fetching class progress:");
     }
   };
 
@@ -179,7 +177,7 @@ export const MyEnrolledClasses = () => {
         return response.data.stats;
       }
     } catch (error) {
-      console.error("Error fetching overall stats:", error);
+      toast.error("Error fetching overall stats:");
     }
 
     // Fallback: calculate from current page data

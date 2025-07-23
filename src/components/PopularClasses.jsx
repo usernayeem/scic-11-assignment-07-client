@@ -39,7 +39,7 @@ export const PopularClasses = () => {
           return;
         }
       } catch (popularError) {
-        console.log("Popular endpoint failed, trying fallback:", popularError);
+        toast.error("Popular endpoint failed, trying fallback:");
       }
 
       // Fallback to all approved classes and sort on frontend
@@ -62,7 +62,6 @@ export const PopularClasses = () => {
         toast.error("Failed to fetch classes");
       }
     } catch (error) {
-      console.error("Error fetching popular classes:", error);
       toast.error("Failed to load popular classes");
     } finally {
       setLoading(false);

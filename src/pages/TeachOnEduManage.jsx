@@ -119,7 +119,6 @@ export const TeachOnEduManage = () => {
         }
       }
     } catch (error) {
-      console.error("Error checking user status:", error);
       toast.error("Failed to load user status");
     } finally {
       setLoading(false);
@@ -141,7 +140,6 @@ export const TeachOnEduManage = () => {
       );
       return response.data;
     } catch (error) {
-      console.error("Error submitting teacher application:", error);
       throw error;
     }
   };
@@ -163,7 +161,6 @@ export const TeachOnEduManage = () => {
         "Application resubmitted successfully! We will review it again."
       );
     } catch (error) {
-      console.error("Error resubmitting application:", error);
       toast.error("Failed to resubmit application. Please try again.");
     } finally {
       setIsResubmitting(false);

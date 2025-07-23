@@ -61,7 +61,6 @@ export const AllClasses = () => {
         toast.error("Failed to fetch classes");
       }
     } catch (error) {
-      console.error("Error fetching classes:", error);
       toast.error("Failed to load classes");
     } finally {
       setLoading(false);
