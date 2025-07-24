@@ -147,7 +147,7 @@ export const Navbar = () => {
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden lg:flex items-center space-x-6">
               <Link
                 to="/"
                 className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
@@ -174,12 +174,20 @@ export const Navbar = () => {
           <div className="flex items-center space-x-4">
             {/* Show Sign In button only when user is not authenticated */}
             {!user && !loading && (
-              <Link
-                to="/login"
-                className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base hidden md:flex"
-              >
-                Log In
-              </Link>
+              <div className="flex gap-4">
+                <Link
+                  to="/login"
+                  className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base hidden lg:flex"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base hidden lg:flex"
+                >
+                  Register
+                </Link>
+              </div>
             )}
 
             {/* Show user profile dropdown when authenticated */}
@@ -248,7 +256,7 @@ export const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
             >
               <CiMenuBurger className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             </button>
@@ -257,7 +265,7 @@ export const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+          <div className="lg:hidden border-t border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
                 to="/"
@@ -283,12 +291,22 @@ export const Navbar = () => {
 
               {/* Mobile Auth Section */}
               {!user && !loading && (
-                <Link
-                  to="/login"
-                  className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base w-full"
-                >
-                  Login In
-                </Link>
+                <div className="flex flex-col gap-4 pt-2">
+                  <Link
+                    to="/login"
+                    className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base w-fit"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login In
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base w-fit"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </div>
               )}
             </div>
           </div>
