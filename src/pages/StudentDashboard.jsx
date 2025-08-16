@@ -4,6 +4,7 @@ import { MdOutlineSchool } from "react-icons/md";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
+import { AiFillHome } from "react-icons/ai";
 
 export const StudentDashboard = () => {
   const { user, Logout } = useContext(AuthContext);
@@ -22,6 +23,11 @@ export const StudentDashboard = () => {
   };
 
   const navigationItems = [
+    {
+      name: "Overview",
+      path: "/student-dashboard/overview",
+      icon: AiFillHome,
+    },
     {
       name: "My Enrolled Classes",
       path: "/student-dashboard/my-enroll-classes",

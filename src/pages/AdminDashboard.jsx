@@ -33,6 +33,11 @@ export const AdminDashboard = () => {
 
   const navigationItems = [
     {
+      name: "Overview",
+      path: "/admin-dashboard/overview",
+      icon: FiHome,
+    },
+    {
       name: "Teacher Request",
       path: "/admin-dashboard/teacher-request",
       icon: FiUserCheck,

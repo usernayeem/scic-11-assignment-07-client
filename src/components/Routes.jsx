@@ -26,6 +26,9 @@ import { EnrolledClassDetails } from "../pages/EnrolledClassDetails";
 import { ClassDetailsTeacher } from "../pages/ClassDetailsTeacher";
 import { ForgotPassword } from "../pages/ForgotPassword";
 import { MyRequest } from "../pages/MyRequest";
+import { StudentOverview } from "../pages/StudentOverview";
+import { TeacherOverview } from "../pages/TeacherOverview";
+import { AdminOverview } from "../pages/AdminOverview";
 
 export const router = createBrowserRouter([
   {
@@ -90,7 +93,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="my-enroll-classes" />,
+            element: <Navigate to="overview" />,
+          },
+          {
+            path: "overview",
+            element: <StudentOverview />,
           },
           {
             path: "my-enroll-classes",
@@ -122,7 +129,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="add-class" />,
+            element: <Navigate to="overview" />,
+          },
+          {
+            path: "overview",
+            element: <TeacherOverview />,
           },
           {
             path: "add-class",
@@ -154,7 +165,11 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Navigate to="teacher-request" />,
+            element: <Navigate to="overview" />,
+          },
+          {
+            path: "overview",
+            element: <AdminOverview />,
           },
           {
             path: "teacher-request",

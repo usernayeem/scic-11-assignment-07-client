@@ -93,13 +93,13 @@ export const Navbar = () => {
 
         // Navigate directly to the default child routes to avoid redirect issues
         if (userRole === "admin") {
-          navigate("/admin-dashboard/teacher-request", { replace: false });
+          navigate("/admin-dashboard/overview", { replace: false });
           toast.success("Welcome to Admin Dashboard!");
         } else if (userRole === "teacher") {
-          navigate("/teacher-dashboard/add-class", { replace: false });
+          navigate("/teacher-dashboard/overview", { replace: false });
           toast.success("Welcome to Teacher Dashboard!");
         } else {
-          navigate("/student-dashboard/my-enroll-classes", { replace: false });
+          navigate("/student-dashboard/overview", { replace: false });
           toast.success("Welcome to Student Dashboard!");
         }
       } else {

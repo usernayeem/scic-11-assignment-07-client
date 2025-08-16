@@ -12,6 +12,7 @@ import { MdOutlineSchool } from "react-icons/md";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
+import { AiFillHome } from "react-icons/ai";
 
 export const TeacherDashboard = () => {
   const { user, Logout } = useContext(AuthContext);
@@ -31,6 +32,11 @@ export const TeacherDashboard = () => {
   };
 
   const navigationItems = [
+    {
+      name: "Overview",
+      path: "/teacher-dashboard/overview",
+      icon: AiFillHome,
+    },
     {
       name: "Add Class",
       path: "/teacher-dashboard/add-class",
