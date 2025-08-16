@@ -29,6 +29,7 @@ import { MyRequest } from "../pages/MyRequest";
 import { StudentOverview } from "../pages/StudentOverview";
 import { TeacherOverview } from "../pages/TeacherOverview";
 import { AdminOverview } from "../pages/AdminOverview";
+import { StudentRoute } from "./StudentRoute";
 
 export const router = createBrowserRouter([
   {
@@ -87,7 +88,9 @@ export const router = createBrowserRouter([
         path: "/student-dashboard",
         element: (
           <PrivateRoute>
-            <StudentDashboard />
+            <StudentRoute>
+              <StudentDashboard />
+            </StudentRoute>
           </PrivateRoute>
         ),
         children: [
