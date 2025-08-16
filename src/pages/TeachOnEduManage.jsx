@@ -270,7 +270,7 @@ export const TeachOnEduManage = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pt-20">
         <div className="max-w-2xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
             <div className="flex items-center justify-center space-x-3">
@@ -288,7 +288,7 @@ export const TeachOnEduManage = () => {
   // Show message if user is already a teacher
   if (userRole === "teacher") {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pt-20">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center w-16 h-16 bg-green-100 dark:bg-green-900 rounded-2xl mx-auto mb-6">
@@ -335,7 +335,7 @@ export const TeachOnEduManage = () => {
   // Show pending status
   if (applicationStatus === "pending" && !showEditForm) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pt-20">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center w-16 h-16 bg-yellow-100 dark:bg-yellow-900 rounded-2xl mx-auto mb-6">
@@ -421,7 +421,7 @@ export const TeachOnEduManage = () => {
   // Show rejected status with edit option
   if (applicationStatus === "rejected" && !showEditForm) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pt-20">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <div className="flex items-center justify-center w-16 h-16 bg-red-100 dark:bg-red-900 rounded-2xl mx-auto mb-6">
@@ -479,7 +479,7 @@ export const TeachOnEduManage = () => {
     : "Join our community of educators and share your expertise with students worldwide. Apply to teach on EduManage today.";
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 pt-20">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
