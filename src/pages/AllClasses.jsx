@@ -10,6 +10,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiX,
+  FiFilter,
 } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
@@ -30,12 +31,49 @@ export const AllClasses = () => {
   const [pageSize, setPageSize] = useState(5);
   const [totalClasses, setTotalClasses] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [sortBy, setSortBy] = useState("newest");
+  const [sortOrder, setSortOrder] = useState("desc");
 
-  // Fetch classes with pagination
+  // Sort options
+  const sortOptions = [
+    {
+      value: "newest",
+      label: "Newest First",
+      sortBy: "createdAt",
+      order: "desc",
+    },
+    {
+      value: "oldest",
+      label: "Oldest First",
+      sortBy: "createdAt",
+      order: "asc",
+    },
+    {
+      value: "price-low",
+      label: "Price: Low to High",
+      sortBy: "price",
+      order: "asc",
+    },
+    {
+      value: "price-high",
+      label: "Price: High to Low",
+      sortBy: "price",
+      order: "desc",
+    },
+    {
+      value: "popular",
+      label: "Most Popular",
+      sortBy: "enrolledStudents",
+      order: "desc",
+    },
+  ];
+
+  // Fetch classes with pagination and sorting
   const fetchClasses = async (
     page = currentPage,
     limit = pageSize,
-    search = searchTerm
+    search = searchTerm,
+    sort = sortBy
   ) => {
     try {
       setLoading(true);
@@ -47,6 +85,13 @@ export const AllClasses = () => {
 
       if (search.trim()) {
         params.append("search", search.trim());
+      }
+
+      // Add sorting parameters
+      const selectedSort = sortOptions.find((option) => option.value === sort);
+      if (selectedSort) {
+        params.append("sortBy", selectedSort.sortBy);
+        params.append("sortOrder", selectedSort.order);
       }
 
       const response = await axios.get(
@@ -73,7 +118,7 @@ export const AllClasses = () => {
     const trimmedSearch = searchInput.trim();
     setSearchTerm(trimmedSearch);
     setCurrentPage(1); // Reset to first page when searching
-    fetchClasses(1, pageSize, trimmedSearch);
+    fetchClasses(1, pageSize, trimmedSearch, sortBy);
   };
 
   // Handle search clear
@@ -81,7 +126,7 @@ export const AllClasses = () => {
     setSearchInput("");
     setSearchTerm("");
     setCurrentPage(1);
-    fetchClasses(1, pageSize, "");
+    fetchClasses(1, pageSize, "", sortBy);
   };
 
   // Handle Enter key press in search input
@@ -91,11 +136,18 @@ export const AllClasses = () => {
     }
   };
 
+  // Handle sort change
+  const handleSortChange = (newSortValue) => {
+    setSortBy(newSortValue);
+    setCurrentPage(1); // Reset to first page when sorting changes
+    fetchClasses(1, pageSize, searchTerm, newSortValue);
+  };
+
   // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
-      fetchClasses(newPage, pageSize, searchTerm);
+      fetchClasses(newPage, pageSize, searchTerm, sortBy);
     }
   };
 
@@ -103,7 +155,7 @@ export const AllClasses = () => {
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
     setCurrentPage(1); // Reset to first page when changing page size
-    fetchClasses(1, newPageSize, searchTerm);
+    fetchClasses(1, newPageSize, searchTerm, sortBy);
   };
 
   // Generate page numbers for pagination
@@ -166,7 +218,7 @@ export const AllClasses = () => {
 
         {/* Search and Controls */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Search Bar */}
             <form
               onSubmit={handleSearchSubmit}
@@ -204,8 +256,26 @@ export const AllClasses = () => {
               </div>
             </form>
 
-            {/* Stats and Controls */}
+            {/* Sort Dropdown */}
             <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <FiFilter className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                  Sort by:
+                </span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => handleSortChange(e.target.value)}
+                  className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 min-w-[160px]"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               {/* Active Search Indicator */}
               {searchTerm && (
                 <div className="flex items-center space-x-2 px-3 py-1 bg-[#5D5CDE]/10 dark:bg-[#5D5CDE]/20 rounded-lg">
@@ -222,7 +292,9 @@ export const AllClasses = () => {
               )}
 
               <button
-                onClick={() => fetchClasses(currentPage, pageSize, searchTerm)}
+                onClick={() =>
+                  fetchClasses(currentPage, pageSize, searchTerm, sortBy)
+                }
                 className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
               >
                 <FiRefreshCw className="w-4 h-4 mr-2" />
