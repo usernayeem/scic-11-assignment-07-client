@@ -65,8 +65,8 @@ export const TeacherCTA = () => {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header Section */}
         <div className="text-center mb-16">
-          <div className="flex items-center justify-center w-20 h-20 bg-[#5D5CDE] bg-opacity-10 rounded-2xl mx-auto mb-6">
-            <MdSchool className="text-white text-3xl" />
+          <div className="flex items-center justify-center w-16 h-16 bg-[#5D5CDE] rounded-2xl mx-auto mb-6">
+            <MdSchool className="text-white text-2xl" />
           </div>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             Inspire the Next Generation

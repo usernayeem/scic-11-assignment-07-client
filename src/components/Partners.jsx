@@ -1,4 +1,5 @@
 import React from "react";
+import { FaHandshake } from "react-icons/fa";
 import { FiExternalLink, FiUsers, FiAward, FiTrendingUp } from "react-icons/fi";
 import { MdBusiness, MdSchool, MdVerified } from "react-icons/md";
 
@@ -71,6 +72,9 @@ export const Partners = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16">
+          <div className="flex items-center justify-center w-16 h-16 bg-[#5D5CDE] rounded-2xl mx-auto mb-6">
+            <FaHandshake className="text-white text-2xl" />
+          </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             Our Trusted Partners
           </h2>
