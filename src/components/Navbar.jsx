@@ -11,6 +11,7 @@ export const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDashboardLoading, setIsDashboardLoading] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [userFromDB, setUserFromDB] = useState(null);
   const dropdownRef = useRef(null);
 
@@ -90,15 +91,15 @@ export const Navbar = () => {
       if (response.data.success) {
         const userRole = response.data.user.role;
 
-        // Redirect based on role
+        // Navigate directly to the default child routes to avoid redirect issues
         if (userRole === "admin") {
-          navigate("/admin-dashboard");
+          navigate("/admin-dashboard/teacher-request", { replace: false });
           toast.success("Welcome to Admin Dashboard!");
         } else if (userRole === "teacher") {
-          navigate("/teacher-dashboard");
+          navigate("/teacher-dashboard/add-class", { replace: false });
           toast.success("Welcome to Teacher Dashboard!");
         } else {
-          navigate("/student-dashboard");
+          navigate("/student-dashboard/my-enroll-classes", { replace: false });
           toast.success("Welcome to Student Dashboard!");
         }
       } else {
@@ -113,9 +114,41 @@ export const Navbar = () => {
     }
   };
 
+  const handleProfileClick = async () => {
+    setIsProfileLoading(true);
+    setIsDropdownOpen(false);
+
+    try {
+      // Fetch user data from backend to get role
+      const response = await axios.get(
+        `${import.meta.env.VITE_API}/users/${user.uid}`
+      );
+
+      if (response.data.success) {
+        const userRole = response.data.user.role;
+
+        // Navigate to profile based on role using replace: false to preserve history
+        navigate(`/${userRole}-dashboard/profile`, { replace: false });
+      } else {
+        toast.error("Unable to determine user role");
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("Failed to access profile. Please try again.");
+      navigate("/");
+    } finally {
+      setIsProfileLoading(false);
+    }
+  };
+
   const handleMobileDashboardClick = () => {
     setIsMobileMenuOpen(false);
     handleDashboardClick();
+  };
+
+  const handleMobileProfileClick = () => {
+    setIsMobileMenuOpen(false);
+    handleProfileClick();
   };
 
   // Get the correct photo URL (backend first, then Firebase)
@@ -132,8 +165,36 @@ export const Navbar = () => {
     return userFromDB?.name || user?.displayName || "User";
   };
 
+  // Navigation items for logged out users (3 routes)
+  const publicNavItems = [
+    { name: "Home", path: "/" },
+    { name: "All Classes", path: "/all-classes" },
+    { name: "Teach on EduManage", path: "/teach" },
+  ];
+
+  // Navigation items for logged in users (5 routes)
+  const privateNavItems = [
+    { name: "Home", path: "/" },
+    { name: "All Classes", path: "/all-classes" },
+    { name: "Teach on EduManage", path: "/teach" },
+    {
+      name: "Dashboard",
+      path: "#",
+      onClick: handleDashboardClick,
+      isSpecial: true,
+    },
+    {
+      name: "My Profile",
+      path: "#",
+      onClick: handleProfileClick,
+      isSpecial: true,
+    },
+  ];
+
+  const currentNavItems = user ? privateNavItems : publicNavItems;
+
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-md border-b border-gray-200 dark:border-gray-700">
+    <nav className="bg-white dark:bg-gray-900 shadow-md border-b border-gray-200 dark:border-gray-700 fixed w-full z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Navigation Links */}
@@ -148,25 +209,38 @@ export const Navbar = () => {
             </Link>
 
             <div className="hidden lg:flex items-center space-x-6">
-              <Link
-                to="/"
-                className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
-              >
-                Home
-              </Link>
-              <Link
-                to="/all-classes"
-                href="#"
-                className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
-              >
-                All Classes
-              </Link>
-              <Link
-                to="/teach"
-                className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
-              >
-                Teach on EduManage
-              </Link>
+              {currentNavItems.map((item, index) =>
+                item.isSpecial ? (
+                  <button
+                    key={index}
+                    onClick={item.onClick}
+                    disabled={
+                      item.name === "Dashboard"
+                        ? isDashboardLoading
+                        : isProfileLoading
+                    }
+                    className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center space-x-1"
+                  >
+                    {(item.name === "Dashboard" && isDashboardLoading) ||
+                    (item.name === "My Profile" && isProfileLoading) ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#5D5CDE]"></div>
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      <span>{item.name}</span>
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
+                  >
+                    {item.name}
+                  </Link>
+                )
+              )}
             </div>
           </div>
 
@@ -267,27 +341,38 @@ export const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link
-                to="/"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                to="/all-classes"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                All Classes
-              </Link>
-              <Link
-                to="/teach"
-                className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Teach on EduManage
-              </Link>
+              {currentNavItems.map((item, index) =>
+                item.isSpecial ? (
+                  <button
+                    key={index}
+                    onClick={
+                      item.name === "Dashboard"
+                        ? handleMobileDashboardClick
+                        : handleMobileProfileClick
+                    }
+                    disabled={
+                      item.name === "Dashboard"
+                        ? isDashboardLoading
+                        : isProfileLoading
+                    }
+                    className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200 disabled:opacity-70"
+                  >
+                    {(item.name === "Dashboard" && isDashboardLoading) ||
+                    (item.name === "My Profile" && isProfileLoading)
+                      ? "Loading..."
+                      : item.name}
+                  </button>
+                ) : (
+                  <Link
+                    key={index}
+                    to={item.path}
+                    className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              )}
 
               {/* Mobile Auth Section */}
               {!user && !loading && (

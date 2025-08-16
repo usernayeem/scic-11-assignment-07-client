@@ -58,7 +58,7 @@ export const Banner = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
+    <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden pt-8 md:pt-0">
       {/* Slides Container */}
       <div
         className="flex transition-transform duration-700 ease-in-out h-full"
