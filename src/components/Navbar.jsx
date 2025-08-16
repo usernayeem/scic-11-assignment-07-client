@@ -4,7 +4,7 @@ import { FiUser, FiChevronDown, FiLogOut, FiGrid } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 
 export const Navbar = () => {
@@ -15,10 +15,11 @@ export const Navbar = () => {
   const [userFromDB, setUserFromDB] = useState(null);
   const dropdownRef = useRef(null);
 
-  // Auth context
+  // Auth context and location
   const { user, Logout, loading } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Fetch user data from backend to get correct photo URL
   const fetchUserData = async () => {
@@ -165,6 +166,49 @@ export const Navbar = () => {
     return userFromDB?.name || user?.displayName || "User";
   };
 
+  // Function to check if a nav item is active
+  const isNavItemActive = (path, itemName) => {
+    const currentPath = location.pathname;
+
+    // Handle special cases for Dashboard and My Profile
+    if (itemName === "Dashboard") {
+      return (
+        currentPath.includes("/dashboard") && !currentPath.includes("/profile")
+      );
+    }
+
+    if (itemName === "My Profile") {
+      return currentPath.includes("/profile");
+    }
+
+    // For regular paths
+    if (path === "/") {
+      return currentPath === "/";
+    }
+
+    return currentPath.startsWith(path);
+  };
+
+  // Get active link classes
+  const getNavLinkClasses = (path, itemName, isMobile = false) => {
+    const isActive = isNavItemActive(path, itemName);
+    const baseClasses = isMobile
+      ? "block px-3 py-2 text-base font-medium transition-colors duration-200 rounded-md"
+      : "transition-colors duration-200 font-medium relative";
+
+    if (isActive) {
+      return `${baseClasses} ${
+        isMobile
+          ? "bg-[#5D5CDE] text-white font-semibold shadow-sm"
+          : "text-[#5D5CDE] dark:text-[#5D5CDE]"
+      }`;
+    }
+
+    return `${baseClasses} text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] ${
+      isMobile ? "hover:bg-gray-50 dark:hover:bg-gray-800" : ""
+    }`;
+  };
+
   // Navigation items for logged out users (3 routes)
   const publicNavItems = [
     { name: "Home", path: "/" },
@@ -219,7 +263,10 @@ export const Navbar = () => {
                         ? isDashboardLoading
                         : isProfileLoading
                     }
-                    className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium disabled:opacity-70 disabled:cursor-not-allowed flex items-center space-x-1"
+                    className={`${getNavLinkClasses(
+                      item.path,
+                      item.name
+                    )} disabled:opacity-70 disabled:cursor-not-allowed flex items-center space-x-1`}
                   >
                     {(item.name === "Dashboard" && isDashboardLoading) ||
                     (item.name === "My Profile" && isProfileLoading) ? (
@@ -230,14 +277,22 @@ export const Navbar = () => {
                     ) : (
                       <span>{item.name}</span>
                     )}
+                    {/* Active indicator for desktop */}
+                    {isNavItemActive(item.path, item.name) && (
+                      <div className="absolute -bottom-5 left-0 right-0 h-0.5 bg-[#5D5CDE]"></div>
+                    )}
                   </button>
                 ) : (
                   <Link
                     key={index}
                     to={item.path}
-                    className="text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] transition-colors duration-200 font-medium"
+                    className={getNavLinkClasses(item.path, item.name)}
                   >
                     {item.name}
+                    {/* Active indicator for desktop */}
+                    {isNavItemActive(item.path, item.name) && (
+                      <div className="absolute -bottom-5 left-0 right-0 h-0.5 bg-[#5D5CDE]"></div>
+                    )}
                   </Link>
                 )
               )}
@@ -355,7 +410,11 @@ export const Navbar = () => {
                         ? isDashboardLoading
                         : isProfileLoading
                     }
-                    className="w-full text-left block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200 disabled:opacity-70"
+                    className={`w-full text-left ${getNavLinkClasses(
+                      item.path,
+                      item.name,
+                      true
+                    )} disabled:opacity-70`}
                   >
                     {(item.name === "Dashboard" && isDashboardLoading) ||
                     (item.name === "My Profile" && isProfileLoading)
@@ -366,7 +425,7 @@ export const Navbar = () => {
                   <Link
                     key={index}
                     to={item.path}
-                    className="block px-3 py-2 text-base font-medium text-gray-700 dark:text-gray-300 hover:text-[#5D5CDE] dark:hover:text-[#5D5CDE] hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md transition-colors duration-200"
+                    className={getNavLinkClasses(item.path, item.name, true)}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item.name}
@@ -382,7 +441,7 @@ export const Navbar = () => {
                     className="bg-[#5D5CDE] hover:bg-[#4A4BC9] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200 text-base w-fit"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Login In
+                    Log In
                   </Link>
                   <Link
                     to="/register"
