@@ -170,23 +170,37 @@ export const Navbar = () => {
   const isNavItemActive = (path, itemName) => {
     const currentPath = location.pathname;
 
-    // Handle special cases for Dashboard and My Profile
-    if (itemName === "Dashboard") {
-      return (
-        currentPath.includes("/dashboard") && !currentPath.includes("/profile")
-      );
-    }
+    switch (itemName) {
+      case "Home":
+        return currentPath === "/";
 
-    if (itemName === "My Profile") {
-      return currentPath.includes("/profile");
-    }
+      case "All Classes":
+        return currentPath.startsWith("/all-classes");
 
-    // For regular paths
-    if (path === "/") {
-      return currentPath === "/";
-    }
+      case "Teach on EduManage":
+        return currentPath === "/teach";
 
-    return currentPath.startsWith(path);
+      case "Dashboard":
+        return (
+          (currentPath.startsWith("/student-dashboard") ||
+            currentPath.startsWith("/teacher-dashboard") ||
+            currentPath.startsWith("/admin-dashboard")) &&
+          !currentPath.includes("/profile")
+        );
+
+      case "My Profile":
+        return (
+          currentPath.includes("/student-dashboard/profile") ||
+          currentPath.includes("/teacher-dashboard/profile") ||
+          currentPath.includes("/admin-dashboard/profile")
+        );
+
+      default:
+        if (path === "/") {
+          return currentPath === "/";
+        }
+        return currentPath.startsWith(path);
+    }
   };
 
   // Get active link classes
