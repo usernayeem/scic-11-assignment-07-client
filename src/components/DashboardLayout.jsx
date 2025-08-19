@@ -1,20 +1,11 @@
 import React, { useContext, useState } from "react";
-import {
-  FiBook,
-  FiUser,
-  FiLogOut,
-  FiHome,
-  FiFileText,
-  FiMenu,
-  FiX,
-} from "react-icons/fi";
+import { FiLogOut, FiHome, FiMenu, FiX } from "react-icons/fi";
 import { MdOutlineSchool } from "react-icons/md";
 import { Link, useLocation, Outlet, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { useToast } from "../contexts/ToastContext";
-import { AiFillHome } from "react-icons/ai";
 
-export const StudentDashboard = () => {
+export const DashboardLayout = ({ title, navigationItems }) => {
   const { user, Logout } = useContext(AuthContext);
   const toast = useToast();
   const navigate = useNavigate();
@@ -31,36 +22,7 @@ export const StudentDashboard = () => {
     }
   };
 
-  const navigationItems = [
-    {
-      name: "Overview",
-      path: "/student-dashboard/overview",
-      icon: AiFillHome,
-    },
-    {
-      name: "My Enrolled Classes",
-      path: "/student-dashboard/my-enroll-classes",
-      icon: FiBook,
-    },
-    {
-      name: "My Request",
-      path: "/student-dashboard/my-request",
-      icon: FiFileText,
-    },
-    {
-      name: "Profile",
-      path: "/student-dashboard/profile",
-      icon: FiUser,
-    },
-  ];
-
-  const isActivePath = (path) => {
-    return location.pathname === path;
-  };
-
-  const handleNavItemClick = () => {
-    setIsMobileNavOpen(false);
-  };
+  const isActivePath = (path) => location.pathname === path;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-16">
@@ -74,15 +36,14 @@ export const StudentDashboard = () => {
               </div>
               <div className="min-w-0 flex-1">
                 <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white truncate">
-                  Student Dashboard
+                  {title}
                 </h1>
                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-300 truncate">
-                  Welcome back, {user?.displayName || "Student"}!
+                  Welcome back, {user?.displayName || "User"}!
                 </p>
               </div>
             </div>
 
-            {/* Home and Logout buttons - Hidden on mobile, visible on tablet and up */}
             <div className="hidden sm:flex items-center space-x-3">
               <Link
                 to="/"
@@ -91,7 +52,6 @@ export const StudentDashboard = () => {
                 <FiHome className="w-4 h-4" />
                 <span>Back to Home</span>
               </Link>
-
               <button
                 onClick={handleLogout}
                 className="bg-red-500 hover:bg-red-600 text-white px-3 md:px-4 py-2 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 text-sm md:text-base"
@@ -105,7 +65,6 @@ export const StudentDashboard = () => {
 
         {/* Navigation */}
         <div className="mb-6 md:mb-8">
-          {/* Mobile Navigation Toggle */}
           <div className="md:hidden mb-4">
             <button
               onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
@@ -120,14 +79,12 @@ export const StudentDashboard = () => {
             </button>
           </div>
 
-          {/* Desktop Navigation Tabs */}
           <div className="hidden md:block">
             <div className="border-b border-gray-200 dark:border-gray-700">
               <nav className="-mb-px flex space-x-6 lg:space-x-8 overflow-x-auto">
                 {navigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = isActivePath(item.path);
-
                   return (
                     <Link
                       key={item.name}
@@ -147,19 +104,17 @@ export const StudentDashboard = () => {
             </div>
           </div>
 
-          {/* Mobile Navigation Menu */}
           {isMobileNavOpen && (
             <div className="md:hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
               <nav className="py-2">
                 {navigationItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = isActivePath(item.path);
-
                   return (
                     <Link
                       key={item.name}
                       to={item.path}
-                      onClick={handleNavItemClick}
+                      onClick={() => setIsMobileNavOpen(false)}
                       className={`flex items-center space-x-3 px-4 py-3 text-base font-medium transition-colors duration-200 ${
                         isActive
                           ? "bg-[#5D5CDE] text-white border-r-4 border-[#5D5CDE]"
@@ -176,7 +131,6 @@ export const StudentDashboard = () => {
           )}
         </div>
 
-        {/* Main Content */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[60vh]">
           <div className="p-4 md:p-6 lg:p-8">
             <Outlet />

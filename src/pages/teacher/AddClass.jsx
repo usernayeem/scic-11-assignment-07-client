@@ -12,8 +12,8 @@ import {
   FiX,
 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import axios from "axios";
 
 export const AddClass = () => {

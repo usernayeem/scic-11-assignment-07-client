@@ -11,8 +11,8 @@ import {
 } from "react-icons/fi";
 import { MdOutlineSchool, MdVerified } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import axios from "axios";
 
 export const MyEnrolledClasses = () => {

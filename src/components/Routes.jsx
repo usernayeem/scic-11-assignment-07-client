@@ -6,30 +6,27 @@ import { Register } from "../pages/Register";
 import { Login } from "../pages/Login";
 import { NotFound } from "../pages/NotFound";
 import { TeachOnEduManage } from "../pages/TeachOnEduManage";
-import { StudentDashboard } from "../pages/StudentDashboard";
-import { MyEnrolledClasses } from "../pages/MyEnrolledClasses";
+import { StudentDashboard } from "../pages/student/StudentDashboard";
 import { Profile } from "../pages/Profile";
-import { TeacherDashboard } from "../pages/TeacherDashboard";
-import { AddClass } from "../pages/AddClass";
-import { MyClassesTeacher } from "../pages/MyClassesTeacher";
-import { AdminDashboard } from "../pages/AdminDashboard";
-import { TeacherRequest } from "../pages/TeacherRequest";
-import { Users } from "../pages/Users";
-import { AdminAllClasses } from "../pages/AdminAllClasses";
-import { PrivateRoute } from "./PrivateRoutes";
-import { TeacherRoute } from "./TeacherRoute";
-import { AdminRoute } from "./AdminRoute";
+import { TeacherDashboard } from "../pages/teacher/TeacherDashboard";
+import { AddClass } from "../pages/teacher/AddClass";
+import { MyClassesTeacher } from "../pages/teacher/MyClassesTeacher";
+import { AdminDashboard } from "../pages/admin/AdminDashboard";
+import { TeacherRequest } from "../pages/admin/TeacherRequest";
+import { Users } from "../pages/admin/Users";
+import { AdminAllClasses } from "../pages/admin/AdminAllClasses";
+import { ProtectedRoute } from "./ProtectedRoute";
 import { AllClasses } from "../pages/AllClasses";
 import { ClassDetails } from "../pages/ClassDetails";
 import { Payment } from "../pages/CheckoutForm";
-import { EnrolledClassDetails } from "../pages/EnrolledClassDetails";
-import { ClassDetailsTeacher } from "../pages/ClassDetailsTeacher";
 import { ForgotPassword } from "../pages/ForgotPassword";
-import { MyRequest } from "../pages/MyRequest";
-import { StudentOverview } from "../pages/StudentOverview";
-import { TeacherOverview } from "../pages/TeacherOverview";
-import { AdminOverview } from "../pages/AdminOverview";
-import { StudentRoute } from "./StudentRoute";
+import { StudentOverview } from "../pages/student/StudentOverview";
+import { TeacherOverview } from "../pages/teacher/TeacherOverview";
+import { AdminOverview } from "../pages/admin/AdminOverview";
+import { ClassDetailsTeacher } from "../pages/teacher/ClassDetailsTeacher";
+import { EnrolledClassDetails } from "../pages/student/EnrolledClassDetails";
+import { MyEnrolledClasses } from "../pages/student/MyEnrolledClasses";
+import { MyRequest } from "../pages/student/MyRequest";
 
 export const router = createBrowserRouter([
   {
@@ -55,43 +52,41 @@ export const router = createBrowserRouter([
       {
         path: "/teach",
         element: (
-          <PrivateRoute>
+          <ProtectedRoute>
             <TeachOnEduManage />
-          </PrivateRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/all-classes",
         element: (
-          <PrivateRoute>
+          <ProtectedRoute>
             <AllClasses />
-          </PrivateRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/all-classes/:id",
         element: (
-          <PrivateRoute>
+          <ProtectedRoute>
             <ClassDetails />
-          </PrivateRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/payment/:id",
         element: (
-          <PrivateRoute>
+          <ProtectedRoute>
             <Payment />
-          </PrivateRoute>
+          </ProtectedRoute>
         ),
       },
       {
         path: "/student-dashboard",
         element: (
-          <PrivateRoute>
-            <StudentRoute>
-              <StudentDashboard />
-            </StudentRoute>
-          </PrivateRoute>
+          <ProtectedRoute requiredRole="student">
+            <StudentDashboard />
+          </ProtectedRoute>
         ),
         children: [
           {
@@ -123,11 +118,9 @@ export const router = createBrowserRouter([
       {
         path: "/teacher-dashboard",
         element: (
-          <PrivateRoute>
-            <TeacherRoute>
-              <TeacherDashboard />
-            </TeacherRoute>
-          </PrivateRoute>
+          <ProtectedRoute requiredRole="teacher">
+            <TeacherDashboard />
+          </ProtectedRoute>
         ),
         children: [
           {
@@ -159,11 +152,9 @@ export const router = createBrowserRouter([
       {
         path: "/admin-dashboard",
         element: (
-          <PrivateRoute>
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          </PrivateRoute>
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
         ),
         children: [
           {

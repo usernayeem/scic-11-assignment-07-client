@@ -17,7 +17,7 @@ import {
 } from "react-icons/fi";
 import { MdVerified, MdPending } from "react-icons/md";
 import axios from "axios";
-import { useToast } from "../contexts/ToastContext";
+import { useToast } from "../../contexts/ToastContext";
 
 export const AdminAllClasses = () => {
   const [classes, setClasses] = useState([]);

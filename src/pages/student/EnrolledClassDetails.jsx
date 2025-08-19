@@ -18,8 +18,8 @@ import {
 } from "react-icons/fi";
 import { MdVerified, MdOutlineSchool, MdRateReview } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 

@@ -13,7 +13,7 @@ import {
 } from "react-icons/fi";
 import { MdAdminPanelSettings } from "react-icons/md";
 import axios from "axios";
-import { useToast } from "../contexts/ToastContext";
+import { useToast } from "../../contexts/ToastContext";
 
 export const Users = () => {
   const [users, setUsers] = useState([]);

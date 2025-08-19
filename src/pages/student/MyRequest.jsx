@@ -12,8 +12,8 @@ import {
 } from "react-icons/fi";
 import { MdVerified, MdPending, MdOutlineSchool } from "react-icons/md";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import axios from "axios";
 
 export const MyRequest = () => {

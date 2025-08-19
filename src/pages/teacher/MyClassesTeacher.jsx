@@ -20,8 +20,8 @@ import {
 } from "react-icons/fi";
 import { MdPending, MdVerified } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
-import { useToast } from "../contexts/ToastContext";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useToast } from "../../contexts/ToastContext";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import Swal from "sweetalert2";
