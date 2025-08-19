@@ -520,7 +520,7 @@ export const AdminAllClasses = () => {
 
                         {/* Description */}
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 dark:text-white max-w-xs">
+                          <div className="text-sm text-gray-900 dark:text-white max-w-md">
                             {truncateText(classItem.description, 100)}
                           </div>
                         </td>
@@ -539,7 +539,7 @@ export const AdminAllClasses = () => {
 
                         {/* Actions */}
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex items-center justify-end space-x-2">
+                          <div className="flex flex-col space-y-2 items-end">
                             {classItem.status === "pending" ? (
                               <>
                                 <button

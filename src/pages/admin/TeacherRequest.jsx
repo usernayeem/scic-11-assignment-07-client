@@ -430,7 +430,7 @@ export const TeacherRequest = () => {
                       {/* Actions */}
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         {application.status === "pending" ? (
-                          <div className="flex items-center justify-end space-x-2">
+                          <div className="flex flex-col space-y-2 items-end">
                             <button
                               onClick={() =>
                                 handleApprove(application._id, application.uid)
