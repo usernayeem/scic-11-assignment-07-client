@@ -19,15 +19,23 @@ export const SimpleBarChart = ({
   title,
   color = "#6366F1",
 }) => {
+  const isMobile = window.innerWidth < 768;
+
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
         {title}
       </h3>
-      <ResponsiveContainer width="100%" height={320}>
+      <ResponsiveContainer width="100%" height={isMobile ? 380 : 320}>
         <BarChart
           data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+          margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: isMobile ? 80 : 40,
+          }}
+          barCategoryGap={isMobile ? "20%" : "10%"}
         >
           <defs>
             <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
@@ -44,10 +52,23 @@ export const SimpleBarChart = ({
           <XAxis
             dataKey={xAxisKey}
             stroke="#6B7280"
-            fontSize={12}
-            fontWeight={500}
             tickLine={false}
             axisLine={false}
+            interval={0}
+            angle={isMobile ? -45 : 0}
+            textAnchor={isMobile ? "end" : "middle"}
+            height={isMobile ? 80 : 40}
+            tick={{
+              fontSize: isMobile ? 10 : 12,
+              fontWeight: 500,
+              fill: "#6B7280",
+            }}
+            tickFormatter={(value) => {
+              const maxLength = isMobile ? 12 : 20;
+              return value.length > maxLength
+                ? `${value.substring(0, maxLength)}...`
+                : value;
+            }}
           />
           <YAxis
             stroke="#6B7280"
@@ -74,6 +95,7 @@ export const SimpleBarChart = ({
             radius={[6, 6, 0, 0]}
             stroke={color}
             strokeWidth={1}
+            maxBarSize={isMobile ? 60 : 80}
           />
         </BarChart>
       </ResponsiveContainer>
