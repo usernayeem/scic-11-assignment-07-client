@@ -41,6 +41,12 @@ export const BaseOverview = ({ config }) => {
     );
   }
 
+  // Filter charts that have data
+  const validCharts = config.charts.filter((chartConfig) => {
+    const data = chartData[chartConfig.dataKey];
+    return data && data.length > 0;
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -64,30 +70,37 @@ export const BaseOverview = ({ config }) => {
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {config.charts.map((chartConfig, index) => {
-          const data = chartData[chartConfig.dataKey];
-          if (!data || data.length === 0) return null;
+      {/* Charts - Dynamic Layout */}
+      {validCharts.length > 0 && (
+        <div
+          className={`grid gap-6 ${
+            validCharts.length === 1
+              ? "grid-cols-1"
+              : "grid-cols-1 lg:grid-cols-2"
+          }`}
+        >
+          {validCharts.map((chartConfig, index) => {
+            const data = chartData[chartConfig.dataKey];
 
-          return chartConfig.type === "bar" ? (
-            <SimpleBarChart
-              key={index}
-              data={data}
-              dataKey={chartConfig.chartDataKey}
-              xAxisKey={chartConfig.xAxisKey}
-              title={chartConfig.title}
-            />
-          ) : (
-            <SimplePieChart
-              key={index}
-              data={data}
-              title={chartConfig.title}
-              colors={chartConfig.colors}
-            />
-          );
-        })}
-      </div>
+            return chartConfig.type === "bar" ? (
+              <SimpleBarChart
+                key={index}
+                data={data}
+                dataKey={chartConfig.chartDataKey}
+                xAxisKey={chartConfig.xAxisKey}
+                title={chartConfig.title}
+              />
+            ) : (
+              <SimplePieChart
+                key={index}
+                data={data}
+                title={chartConfig.title}
+                colors={chartConfig.colors}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

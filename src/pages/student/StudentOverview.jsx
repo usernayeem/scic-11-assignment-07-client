@@ -25,17 +25,6 @@ const studentConfig = {
 
     const payments = paymentsResponse.data.payments || [];
 
-    // Process data
-    const categoryCount = {};
-    enrolledClasses.forEach((cls) => {
-      categoryCount[cls.category] = (categoryCount[cls.category] || 0) + 1;
-    });
-
-    const categoryData = Object.entries(categoryCount).map(([name, value]) => ({
-      name,
-      value,
-    }));
-
     // Recent classes (last 5)
     const recent = enrolledClasses.slice(0, 5).map((cls) => ({
       name: cls.title,
@@ -54,7 +43,6 @@ const studentConfig = {
       },
       chartData: {
         recentClasses: recent,
-        classCategories: categoryData,
       },
     };
   },
@@ -97,11 +85,6 @@ const studentConfig = {
       chartDataKey: "enrollments",
       xAxisKey: "name",
       title: "Class Popularity (Your Enrolled Classes)",
-    },
-    {
-      type: "pie",
-      dataKey: "classCategories",
-      title: "Your Classes by Category",
     },
   ],
 };
