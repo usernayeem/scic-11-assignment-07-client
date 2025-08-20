@@ -59,11 +59,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/all-classes",
-        element: (
-          <ProtectedRoute>
-            <AllClasses />
-          </ProtectedRoute>
-        ),
+        element: <AllClasses />,
       },
       {
         path: "/all-classes/:id",
