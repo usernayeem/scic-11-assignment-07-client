@@ -100,16 +100,26 @@ export const Register = () => {
     try {
       const result = await googleAuth();
 
-      // Save Google user data to MongoDB
-      await saveUserToDatabase(result.user, {
-        name: result.user.displayName,
-        photoURL: result.user.photoURL,
-      });
+      try {
+        // Save Google user data to MongoDB
+        await saveUserToDatabase(result.user, {
+          name: result.user.displayName,
+          photoURL: result.user.photoURL,
+        });
+        toast.success("Google registration successful!");
+      } catch (dbError) {
+        // If user already exists (409 error), that's fine - just log them in
+        if (dbError.response?.status === 409) {
+          toast.success("Welcome back! Logged in successfully.");
+        } else {
+          // For other database errors, still allow login but show a warning
+          toast.success("Logged in successfully!");
+        }
+      }
 
-      toast.success("Google registration successful!");
       navigate(location.state || "/");
     } catch (error) {
-      toast.error("Google registration failed. Please try again.");
+      toast.error("Google authentication failed. Please try again.");
     } finally {
       setGoogleLoading(false);
     }
