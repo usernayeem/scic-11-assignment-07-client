@@ -28,26 +28,13 @@ export const AllClasses = () => {
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(12);
   const [totalClasses, setTotalClasses] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [sortBy, setSortBy] = useState("newest");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortBy, setSortBy] = useState("price-low");
 
-  // Sort options
+  // Only two sorting functionality - Price Low to High and High to Low
   const sortOptions = [
-    {
-      value: "newest",
-      label: "Newest First",
-      sortBy: "createdAt",
-      order: "desc",
-    },
-    {
-      value: "oldest",
-      label: "Oldest First",
-      sortBy: "createdAt",
-      order: "asc",
-    },
     {
       value: "price-low",
       label: "Price: Low to High",
@@ -58,12 +45,6 @@ export const AllClasses = () => {
       value: "price-high",
       label: "Price: High to Low",
       sortBy: "price",
-      order: "desc",
-    },
-    {
-      value: "popular",
-      label: "Most Popular",
-      sortBy: "enrolledStudents",
       order: "desc",
     },
   ];
@@ -117,7 +98,7 @@ export const AllClasses = () => {
     e.preventDefault();
     const trimmedSearch = searchInput.trim();
     setSearchTerm(trimmedSearch);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
     fetchClasses(1, pageSize, trimmedSearch, sortBy);
   };
 
@@ -139,7 +120,7 @@ export const AllClasses = () => {
   // Handle sort change
   const handleSortChange = (newSortValue) => {
     setSortBy(newSortValue);
-    setCurrentPage(1); // Reset to first page when sorting changes
+    setCurrentPage(1);
     fetchClasses(1, pageSize, searchTerm, newSortValue);
   };
 
@@ -148,13 +129,14 @@ export const AllClasses = () => {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
       fetchClasses(newPage, pageSize, searchTerm, sortBy);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   // Handle page size change
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
     fetchClasses(1, newPageSize, searchTerm, sortBy);
   };
 
@@ -166,7 +148,6 @@ export const AllClasses = () => {
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-    // Adjust start page if we're near the end
     if (endPage - startPage < maxVisiblePages - 1) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -218,6 +199,27 @@ export const AllClasses = () => {
 
         {/* Search and Controls */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6 mb-8">
+          {/* Header with Refresh Button */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Browse Classes
+              </h2>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                Search and sort classes by price
+              </p>
+            </div>
+            <button
+              onClick={() =>
+                fetchClasses(currentPage, pageSize, searchTerm, sortBy)
+              }
+              className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
+            >
+              <FiRefreshCw className="w-4 h-4 mr-2" />
+              Refresh
+            </button>
+          </div>
+
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Search Bar */}
             <form
@@ -256,51 +258,77 @@ export const AllClasses = () => {
               </div>
             </form>
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <FiFilter className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+            {/* Enhanced Sort Dropdown and Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              {/* Enhanced Sort Dropdown */}
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                  <FiFilter className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                </div>
                 <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                  Sort by:
+                  Sort by Price:
                 </span>
-                <select
-                  value={sortBy}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-transparent transition-all duration-200 min-w-[160px]"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => handleSortChange(e.target.value)}
+                    className="appearance-none text-sm border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2.5 pr-10 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#5D5CDE] focus:border-[#5D5CDE] transition-all duration-200 min-w-[180px] cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 shadow-sm"
+                  >
+                    {sortOptions.map((option, index) => (
+                      <option
+                        key={option.value}
+                        value={option.value}
+                        className="py-3 px-4 text-gray-900 dark:text-white bg-white dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 last:border-b-0"
+                      >
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  {/* Custom dropdown arrow */}
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg
+                      className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               {/* Active Search Indicator */}
               {searchTerm && (
-                <div className="flex items-center space-x-2 px-3 py-1 bg-[#5D5CDE]/10 dark:bg-[#5D5CDE]/20 rounded-lg">
-                  <span className="text-sm text-[#5D5CDE] dark:text-[#5D5CDE]">
+                <div className="flex items-center space-x-2 px-3 py-2 bg-[#5D5CDE]/10 dark:bg-[#5D5CDE]/20 rounded-lg border border-[#5D5CDE]/20 dark:border-[#5D5CDE]/30">
+                  <span className="text-sm text-[#5D5CDE] dark:text-[#5D5CDE] font-medium">
                     Searching: "{searchTerm}"
                   </span>
                   <button
                     onClick={handleSearchClear}
-                    className="text-[#5D5CDE] hover:text-[#4A4BC9] transition-colors duration-200"
+                    className="text-[#5D5CDE] hover:text-[#4A4BC9] transition-colors duration-200 p-1 hover:bg-[#5D5CDE]/10 rounded"
                   >
-                    <FiX className="h-4 w-4" />
+                    <FiX className="h-3 w-3" />
                   </button>
                 </div>
               )}
-
-              <button
-                onClick={() =>
-                  fetchClasses(currentPage, pageSize, searchTerm, sortBy)
-                }
-                className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200"
-              >
-                <FiRefreshCw className="w-4 h-4 mr-2" />
-                Refresh
-              </button>
             </div>
+          </div>
+
+          {/* Results Summary */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-gray-600 dark:text-gray-300 pt-4 border-t border-gray-200 dark:border-gray-700 mt-6">
+            <div className="flex items-center space-x-2">
+              <span>Currently sorted by:</span>
+              <span className="font-medium text-[#5D5CDE]">
+                {sortOptions.find((option) => option.value === sortBy)?.label}
+              </span>
+            </div>
+            <div>{totalClasses} classes found</div>
           </div>
         </div>
 
@@ -338,7 +366,7 @@ export const AllClasses = () => {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
             {classes.map((classItem) => (
               <div
                 key={classItem._id}
@@ -407,7 +435,7 @@ export const AllClasses = () => {
           </div>
         )}
 
-        {/* Pagination - Always Visible */}
+        {/* Pagination */}
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm p-6">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             {/* Left Side: Pagination Info and Page Size Selector */}
