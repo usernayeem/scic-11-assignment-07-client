@@ -9,7 +9,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
-import { MdOutlineSchool, MdVerified } from "react-icons/md";
+import { MdOutlineSchool } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useToast } from "../../contexts/ToastContext";
@@ -394,12 +394,6 @@ export const MyEnrolledClasses = () => {
                             "https://i.ibb.co/GQzR5BLS/image-not-found.webp";
                         }}
                       />
-                      <div className="absolute top-4 left-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                          <MdVerified className="w-3 h-3 mr-1" />
-                          Enrolled
-                        </span>
-                      </div>
                       <div className="absolute top-4 right-4">
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
