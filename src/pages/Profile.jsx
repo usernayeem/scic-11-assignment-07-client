@@ -1,5 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
-import { FiUser, FiMail, FiCalendar, FiSettings } from "react-icons/fi";
+import {
+  FiUser,
+  FiMail,
+  FiCalendar,
+  FiSettings,
+  FiStar,
+  FiAward,
+} from "react-icons/fi";
+import { MdVerified, MdOutlineSchool } from "react-icons/md";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 
@@ -24,7 +32,7 @@ export const Profile = () => {
         setUserFromDB(response.data.user);
       }
     } catch (error) {
-      setUserRole("student"); // Default fallback
+      setUserRole("student");
       setUserFromDB(null);
     } finally {
       setRoleLoading(false);
@@ -49,137 +57,207 @@ export const Profile = () => {
     return userFromDB?.name || user?.displayName || "Student";
   };
 
-  // Get role badge with proper styling
+  // Get role badge with consistent styling
   const getRoleBadge = (role) => {
     switch (role) {
       case "admin":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
+          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white shadow-lg">
+            <FiAward className="w-4 h-4 mr-2" />
             Admin
-          </span>
+          </div>
         );
       case "teacher":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
+          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white shadow-lg">
+            <MdOutlineSchool className="w-4 h-4 mr-2" />
             Teacher
-          </span>
+          </div>
         );
       case "student":
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white shadow-lg">
+            <FiStar className="w-4 h-4 mr-2" />
             Student
-          </span>
+          </div>
         );
       default:
         return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400">
+          <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-[#5D5CDE] to-[#4A4BC9] text-white shadow-lg">
+            <FiUser className="w-4 h-4 mr-2" />
             User
-          </span>
+          </div>
         );
     }
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8">
-      {/* Profile Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="p-4 sm:p-6 lg:p-8">
-          <div className="flex flex-col md:flex-row md:items-center gap-6">
-            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 lg:space-x-6">
-              <img
-                src={getPhotoURL()}
-                alt="Profile"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-4 border-gray-200 dark:border-gray-600 mx-auto sm:mx-0 flex-shrink-0"
-                onError={(e) => {
-                  e.target.src =
-                    "https://i.ibb.co/4wsPz9SL/profile-removebg-preview.webp";
-                }}
-              />
-              <div className="text-center sm:text-left min-w-0 flex-1 md:ml-4">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white truncate">
-                  {getDisplayName()}
-                </h1>
-                <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg truncate">
-                  {userFromDB?.email || user?.email}
-                </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 -m-8 p-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* Main Profile Card */}
+        <div className="relative overflow-hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700">
+          {/* Header with Gradient Background */}
+          <div className="relative bg-gradient-to-br from-[#5D5CDE] via-[#4A4BC9] to-[#3A3AB9] px-8 py-12 sm:px-12 sm:py-16">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+
+            <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+              {/* Profile Picture and Basic Info */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                <div className="relative mx-auto sm:mx-0">
+                  <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-white/20 backdrop-blur-sm p-2">
+                    <img
+                      src={getPhotoURL()}
+                      alt="Profile"
+                      className="w-full h-full rounded-full object-cover shadow-2xl"
+                      onError={(e) => {
+                        e.target.src =
+                          "https://i.ibb.co/4wsPz9SL/profile-removebg-preview.webp";
+                      }}
+                    />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-lg">
+                    <MdVerified className="w-6 h-6 text-[#5D5CDE]" />
+                  </div>
+                </div>
+
+                <div className="text-center sm:text-left">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3 drop-shadow-lg">
+                    {getDisplayName()}
+                  </h1>
+                  <p className="text-xl sm:text-2xl text-white/90 mb-4 drop-shadow">
+                    {userFromDB?.email || user?.email}
+                  </p>
+                  <div className="flex justify-center sm:justify-start">
+                    {roleLoading ? (
+                      <div className="flex items-center space-x-3 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span className="text-white font-medium">
+                          Loading role...
+                        </span>
+                      </div>
+                    ) : (
+                      getRoleBadge(userRole)
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Profile Information */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-            Profile Information
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Your personal information and account details
-          </p>
-        </div>
+          {/* Profile Information Grid */}
+          <div className="p-8 sm:p-12">
+            <div className="mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Profile Information
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
+                Your personal information and account details
+              </p>
+            </div>
 
-        <div className="p-4 sm:p-6">
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Full Name
-                </label>
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <FiUser className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <p className="text-base text-gray-900 dark:text-white truncate">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {/* Full Name */}
+              <div className="group">
+                <div className="bg-gradient-to-br from-[#5D5CDE]/5 to-[#4A4BC9]/10 dark:from-[#5D5CDE]/10 dark:to-[#4A4BC9]/20 rounded-2xl p-6 h-full border border-[#5D5CDE]/20 dark:border-[#5D5CDE]/30 hover:shadow-xl hover:shadow-[#5D5CDE]/10 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#5D5CDE] to-[#4A4BC9] rounded-xl flex items-center justify-center shadow-lg">
+                      <FiUser className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#5D5CDE] dark:text-[#5D5CDE] uppercase tracking-wide">
+                        Full Name
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
                     {getDisplayName()}
                   </p>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <FiMail className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <p className="text-base text-gray-900 dark:text-white truncate">
+              {/* Email Address */}
+              <div className="group">
+                <div className="bg-gradient-to-br from-[#5D5CDE]/5 to-[#4A4BC9]/10 dark:from-[#5D5CDE]/10 dark:to-[#4A4BC9]/20 rounded-2xl p-6 h-full border border-[#5D5CDE]/20 dark:border-[#5D5CDE]/30 hover:shadow-xl hover:shadow-[#5D5CDE]/10 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#5D5CDE] to-[#4A4BC9] rounded-xl flex items-center justify-center shadow-lg">
+                      <FiMail className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#5D5CDE] dark:text-[#5D5CDE] uppercase tracking-wide">
+                        Email Address
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white break-all">
                     {userFromDB?.email || user?.email}
                   </p>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Member Since
-                </label>
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <FiCalendar className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  <p className="text-base text-gray-900 dark:text-white">
+              {/* Member Since */}
+              <div className="group">
+                <div className="bg-gradient-to-br from-[#5D5CDE]/5 to-[#4A4BC9]/10 dark:from-[#5D5CDE]/10 dark:to-[#4A4BC9]/20 rounded-2xl p-6 h-full border border-[#5D5CDE]/20 dark:border-[#5D5CDE]/30 hover:shadow-xl hover:shadow-[#5D5CDE]/10 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#5D5CDE] to-[#4A4BC9] rounded-xl flex items-center justify-center shadow-lg">
+                      <FiCalendar className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#5D5CDE] dark:text-[#5D5CDE] uppercase tracking-wide">
+                        Member Since
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                     {userFromDB?.createdAt
-                      ? new Date(userFromDB.createdAt).toLocaleDateString()
+                      ? new Date(userFromDB.createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
                       : user?.metadata?.creationTime
-                      ? new Date(
-                          user.metadata.creationTime
-                        ).toLocaleDateString()
+                      ? new Date(user.metadata.creationTime).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          }
+                        )
                       : "N/A"}
                   </p>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Role
-                </label>
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                  <FiSettings className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  {roleLoading ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400"></div>
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Loading...
-                      </span>
+              {/* Role */}
+              <div className="group">
+                <div className="bg-gradient-to-br from-[#5D5CDE]/5 to-[#4A4BC9]/10 dark:from-[#5D5CDE]/10 dark:to-[#4A4BC9]/20 rounded-2xl p-6 h-full border border-[#5D5CDE]/20 dark:border-[#5D5CDE]/30 hover:shadow-xl hover:shadow-[#5D5CDE]/10 transition-all duration-300 transform hover:-translate-y-1">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#5D5CDE] to-[#4A4BC9] rounded-xl flex items-center justify-center shadow-lg">
+                      <FiSettings className="w-6 h-6 text-white" />
                     </div>
-                  ) : (
-                    getRoleBadge(userRole)
-                  )}
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#5D5CDE] dark:text-[#5D5CDE] uppercase tracking-wide">
+                        Account Role
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    {roleLoading ? (
+                      <div className="flex items-center space-x-3">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#5D5CDE]"></div>
+                        <span className="text-lg text-gray-500 dark:text-gray-400 font-medium">
+                          Loading...
+                        </span>
+                      </div>
+                    ) : (
+                      getRoleBadge(userRole)
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
